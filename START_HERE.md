@@ -48,6 +48,8 @@ export TEAM_SCRATCH=/lustre/fs01/hackathons/teams/$IAG_TEAM
 cd "$TEAM_SCRATCH"
 ```
 
+If you are testing with an admin or personal account that is not in an `iag-team<N>` group, set `TEAM_SCRATCH` explicitly before starting JupyterLab or VS Code.
+
 Put datasets, checkpoints, notebooks, and cloned repos under this directory.
 
 The helper scripts start in this team directory by default so teammates can collaborate in the same fast-storage workspace. Per-user runtime files such as virtual environments, logs, and tunnel commands are stored under:
@@ -128,6 +130,12 @@ Submit a Jupyter job:
 iag-jupyter --gpus 1
 ```
 
+For testing a specific team path:
+
+```bash
+iag-jupyter --gpus 1 --workspace /lustre/fs01/hackathons/teams/iag-team<N>
+```
+
 or:
 
 ```bash
@@ -159,6 +167,12 @@ If `code-server` is available on the cluster, start a VS Code-like browser sessi
 
 ```bash
 iag-code --gpus 1
+```
+
+For testing a specific team path:
+
+```bash
+iag-code --gpus 1 --workspace /lustre/fs01/hackathons/teams/iag-team<N>
 ```
 
 or:

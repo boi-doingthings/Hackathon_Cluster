@@ -19,10 +19,17 @@ if [[ -z "$TEAM" ]]; then
     TEAM="$(id -Gn | tr ' ' '\n' | grep -E '^iag-team[0-9]+$' | head -n 1 || true)"
 fi
 
-if [[ -n "$TEAM" ]]; then
-    TEAM_SCRATCH="${TEAM_SCRATCH:-/lustre/fs01/hackathons/teams/${TEAM}}"
-    cd "$TEAM_SCRATCH"
+if [[ -z "${TEAM_SCRATCH:-}" && -n "$TEAM" ]]; then
+    TEAM_SCRATCH="/lustre/fs01/hackathons/teams/${TEAM}"
 fi
+
+if [[ -z "${TEAM_SCRATCH:-}" || ! -d "$TEAM_SCRATCH" || ! -w "$TEAM_SCRATCH" ]]; then
+    echo "Could not detect writable team storage." >&2
+    echo "Set TEAM_SCRATCH=/lustre/fs01/hackathons/teams/iag-team<N> before submitting." >&2
+    exit 1
+fi
+
+cd "$TEAM_SCRATCH"
 
 RUNTIME_DIR="${PWD}/.iag/${USER:-user}"
 mkdir -p \

@@ -57,6 +57,8 @@ export IAG_TEAM=iag-team7
 export TEAM_SCRATCH=/lustre/fs01/hackathons/teams/$IAG_TEAM
 ```
 
+JupyterLab, VS Code, and interactive shells require a writable team storage path. They will not silently fall back to `$HOME`.
+
 Shared project files should live directly under `$TEAM_SCRATCH`.
 
 Per-user runtime files live under:

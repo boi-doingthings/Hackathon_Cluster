@@ -42,6 +42,25 @@ iag_team_scratch() {
     echo "${IAG_TEAM_ROOT}/${team}"
 }
 
+iag_detect_writable_team_scratch() {
+    local matches=()
+    local candidate
+
+    [[ -d "$IAG_TEAM_ROOT" ]] || return 1
+
+    for candidate in "$IAG_TEAM_ROOT"/iag-team*; do
+        [[ -d "$candidate" && -w "$candidate" && -x "$candidate" ]] || continue
+        matches+=("$candidate")
+    done
+
+    if [[ "${#matches[@]}" -eq 1 ]]; then
+        echo "${matches[0]}"
+        return 0
+    fi
+
+    return 1
+}
+
 iag_validate_gpus() {
     local gpus="$1"
     case "$gpus" in
@@ -69,11 +88,35 @@ iag_workspace_dir() {
     team="$(iag_detect_team)"
     scratch="$(iag_team_scratch "$team" || true)"
 
-    if [[ -n "$scratch" && -d "$scratch" && -w "$scratch" ]]; then
+    if [[ -n "$scratch" && -d "$scratch" && -w "$scratch" && -x "$scratch" ]]; then
         echo "$scratch"
-    else
-        echo "$PWD"
+        return 0
     fi
+
+    iag_detect_writable_team_scratch
+}
+
+iag_require_workspace_dir() {
+    local workspace
+
+    workspace="$(iag_workspace_dir || true)"
+    if [[ -n "$workspace" && -d "$workspace" && -w "$workspace" && -x "$workspace" ]]; then
+        echo "$workspace"
+        return 0
+    fi
+
+    cat >&2 <<'EOF'
+error: could not detect a writable team fast-storage directory.
+
+Set it explicitly, then rerun the command:
+
+  export TEAM_SCRATCH=/lustre/fs01/hackathons/teams/iag-team<N>
+
+If you know your team number, you may also set:
+
+  export IAG_TEAM=iag-team<N>
+EOF
+    exit 1
 }
 
 iag_runtime_dir() {
@@ -94,7 +137,7 @@ iag_logs_dir() {
     local workspace
     local runtime_dir
 
-    workspace="$(iag_workspace_dir)"
+    workspace="$(iag_workspace_dir || true)"
 
     if [[ -n "$workspace" && -d "$workspace" && -w "$workspace" ]]; then
         runtime_dir="$(iag_runtime_dir "$workspace")"

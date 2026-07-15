@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/iag-common"
 
 usage() {
     cat <<'EOF'
-Usage: iag-shell [--gpus 1|2|3|4] [--time HH:MM:SS] [--partition NAME] [--cpus N] [--mem SIZE]
+Usage: iag-shell [--gpus 1|2|3|4] [--time HH:MM:SS] [--partition NAME] [--cpus N] [--mem SIZE] [--workspace PATH]
 
 Start an interactive shell on a Slurm compute node. Rootless Docker is started automatically.
 Memory is not requested by default; pass --mem only if you need a specific amount.
@@ -20,6 +20,7 @@ time_limit="$IAG_DEFAULT_TIME"
 partition="$IAG_DEFAULT_PARTITION"
 cpus="$IAG_DEFAULT_CPUS"
 mem="$IAG_DEFAULT_MEM"
+workspace=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -28,6 +29,7 @@ while [[ $# -gt 0 ]]; do
         --partition) partition="${2:-}"; shift 2 ;;
         --cpus) cpus="${2:-}"; shift 2 ;;
         --mem) mem="${2:-}"; shift 2 ;;
+        --workspace) workspace="${2:-}"; shift 2 ;;
         -h|--help) usage; exit 0 ;;
         *) iag_die "unknown option: $1" ;;
     esac
@@ -35,7 +37,12 @@ done
 
 iag_validate_gpus "$gpus"
 iag_need_cmd srun
-workdir="$(iag_workspace_dir)"
+if [[ -n "$workspace" ]]; then
+    [[ -d "$workspace" && -w "$workspace" && -x "$workspace" ]] || iag_die "workspace is not writable: $workspace"
+    workdir="$workspace"
+else
+    workdir="$(iag_require_workspace_dir)"
+fi
 
 echo "Requesting interactive Slurm shell..."
 echo "GPUs: $gpus"
