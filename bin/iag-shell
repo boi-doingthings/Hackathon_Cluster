@@ -35,6 +35,7 @@ done
 
 iag_validate_gpus "$gpus"
 iag_need_cmd srun
+workdir="$(iag_workspace_dir)"
 
 echo "Requesting interactive Slurm shell..."
 echo "GPUs: $gpus"
@@ -44,6 +45,7 @@ echo "Time: $time_limit"
 echo "Partition: $partition"
 echo
 iag_context
+echo "Start directory: $workdir"
 echo
 
 args=(
@@ -51,6 +53,7 @@ args=(
     --gres "gpu:${gpus}"
     --cpus-per-task "$cpus"
     --time "$time_limit"
+    --chdir "$workdir"
 )
 
 if [[ -n "$mem" ]]; then
@@ -60,7 +63,9 @@ fi
 exec srun "${args[@]}" \
     --pty bash -lc '
         set -euo pipefail
+        umask 0007
         echo "Compute node: $(hostname -f 2>/dev/null || hostname)"
+        echo "Working directory: $PWD"
         echo "Loading rootless Docker..."
         module load rootless-docker
         if command -v start_rootless_docker >/dev/null 2>&1; then

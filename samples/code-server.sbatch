@@ -1,17 +1,16 @@
 #!/bin/bash -l
-#SBATCH --job-name=iag-jupyter
+#SBATCH --job-name=iag-code
 #SBATCH --partition=primary
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=04:00:00
-#SBATCH --output=jupyter-%j.out
+#SBATCH --output=code-%j.out
 
 set -euo pipefail
 umask 0007
 
-EXTERNAL_PORT="${EXTERNAL_PORT:-8001}"
+EXTERNAL_PORT="${EXTERNAL_PORT:-8080}"
 LOGIN_HOST="${IAG_LOGIN_HOST:-ssh.axisapps.io}"
-VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
 
 TEAM="${IAG_TEAM:-}"
@@ -26,24 +25,18 @@ fi
 
 RUNTIME_DIR="${PWD}/.iag/${USER:-user}"
 mkdir -p \
-    "${RUNTIME_DIR}/venvs" \
-    "${RUNTIME_DIR}/jupyter/config" \
-    "${RUNTIME_DIR}/jupyter/data" \
-    "${RUNTIME_DIR}/jupyter/runtime" \
-    "${RUNTIME_DIR}/ipython" \
-    "${RUNTIME_DIR}/cache/uv" \
-    "${RUNTIME_DIR}/cache/pip"
+    "${RUNTIME_DIR}/code-server/config" \
+    "${RUNTIME_DIR}/code-server/data" \
+    "${RUNTIME_DIR}/code-server/extensions" \
+    "${RUNTIME_DIR}/cache"
 chmod -R g+rwX "${PWD}/.iag" 2>/dev/null || true
 
-export JUPYTER_CONFIG_DIR="${RUNTIME_DIR}/jupyter/config"
-export JUPYTER_DATA_DIR="${RUNTIME_DIR}/jupyter/data"
-export JUPYTER_RUNTIME_DIR="${RUNTIME_DIR}/jupyter/runtime"
-export IPYTHONDIR="${RUNTIME_DIR}/ipython"
-export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
-export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
+export XDG_CONFIG_HOME="${RUNTIME_DIR}/code-server/config"
+export XDG_DATA_HOME="${RUNTIME_DIR}/code-server/data"
+export XDG_CACHE_HOME="${RUNTIME_DIR}/cache"
 
 while true; do
-    PORT="$(shuf -n 1 -i 9000-9999)"
+    PORT="$(shuf -n 1 -i 10000-10999)"
     if command -v ss >/dev/null 2>&1; then
         ss -ltn | awk '{print $4}' | grep -q ":${PORT}$" || break
     elif command -v netstat >/dev/null 2>&1; then
@@ -53,10 +46,11 @@ while true; do
     fi
 done
 
-echo "Jupyter job started"
+echo "VS Code job started"
 echo "Node: ${NODE}"
-echo "Internal Jupyter port: ${PORT}"
+echo "Internal code-server port: ${PORT}"
 echo "Local browser port: ${EXTERNAL_PORT}"
+echo "Workspace: ${PWD}"
 echo
 
 nvidia-smi -L || true
@@ -71,21 +65,14 @@ fi
 docker version
 echo
 
-module load uv
-VENV_DIR="${RUNTIME_DIR}/venvs/${VENV_NAME}"
-if [[ ! -d "$VENV_DIR" ]]; then
-    uv venv "$VENV_DIR"
+if ! command -v code-server >/dev/null 2>&1; then
+    echo "code-server is not available in this environment." >&2
+    echo "Ask the support team to install code-server as a module or put it on PATH." >&2
+    exit 127
 fi
-source "${VENV_DIR}/bin/activate"
-if ! command -v jupyter >/dev/null 2>&1; then
-    uv pip install --upgrade pip
-    uv pip install jupyterlab
-fi
-echo "Jupyter venv: ${VENV_DIR}"
-echo
 
 HASHNUMBER="${UNIQUE_AXIS_HASH:-${USER:-<UNIQUE_AXIS_HASH>}}"
-TUNNEL_FILE="${RUNTIME_DIR}/port_forwarding_command.jupyter"
+TUNNEL_FILE="${RUNTIME_DIR}/port_forwarding_command.code"
 echo "From your laptop, run:"
 echo "ssh -L localhost:${EXTERNAL_PORT}:${NODE}:${PORT} ${LOGIN_HOST} -l ${HASHNUMBER}"
 echo
@@ -96,11 +83,10 @@ echo "ssh -L localhost:${EXTERNAL_PORT}:${NODE}:${PORT} ${LOGIN_HOST} -l ${HASHN
 echo "Port forwarding command was also written to: ${TUNNEL_FILE}"
 echo
 
-exec jupyter lab \
-    --no-browser \
-    --allow-root \
-    --ip=0.0.0.0 \
-    --port="${PORT}" \
-    --ServerApp.token="" \
-    --NotebookApp.token="" \
-    --notebook-dir="${PWD}"
+exec code-server \
+    --bind-addr "0.0.0.0:${PORT}" \
+    --auth none \
+    --disable-telemetry \
+    --user-data-dir "${RUNTIME_DIR}/code-server/data" \
+    --extensions-dir "${RUNTIME_DIR}/code-server/extensions" \
+    "${PWD}"

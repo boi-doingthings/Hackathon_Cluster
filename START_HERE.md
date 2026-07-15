@@ -48,7 +48,15 @@ export TEAM_SCRATCH=/lustre/fs01/hackathons/teams/$IAG_TEAM
 cd "$TEAM_SCRATCH"
 ```
 
-Put datasets, virtual environments, checkpoints, logs, and cloned repos under this directory.
+Put datasets, checkpoints, notebooks, and cloned repos under this directory.
+
+The helper scripts start in this team directory by default so teammates can collaborate in the same fast-storage workspace. Per-user runtime files such as virtual environments, logs, and tunnel commands are stored under:
+
+```bash
+$TEAM_SCRATCH/.iag/$USER/
+```
+
+This avoids conflicts between the five user accounts on the same team.
 
 ## 4. Important Warning
 
@@ -128,7 +136,7 @@ iag-jupyter --gpus 4 --time 08:00:00
 
 The command prints the Slurm job id and tells you where the log file will appear. Once the job starts, the log shows the SSH tunnel command and the local browser URL.
 
-`iag-jupyter` creates a virtual environment under your team storage and installs JupyterLab inside it. It also starts rootless Docker automatically.
+`iag-jupyter` starts in your team storage directory. It creates a per-user virtual environment under `$TEAM_SCRATCH/.iag/$USER/venvs/iag-jupyter` and installs JupyterLab inside it. It also starts rootless Docker automatically.
 
 The first launch can take a few minutes while the virtual environment is created. Later launches reuse the same environment.
 
@@ -142,10 +150,40 @@ iag-jupyter --gpus 1
 After the job starts, you can also see the tunnel command with:
 
 ```bash
-cat "$TEAM_SCRATCH/port_forwarding_command"
+cat "$TEAM_SCRATCH/.iag/$USER/port_forwarding_command.jupyter"
 ```
 
-## 8. Submit A Batch Job
+## 8. Start VS Code In The Browser
+
+If `code-server` is available on the cluster, start a VS Code-like browser session on a GPU node:
+
+```bash
+iag-code --gpus 1
+```
+
+or:
+
+```bash
+iag-code --gpus 4 --time 08:00:00
+```
+
+The editor opens in your team storage directory. Rootless Docker is started automatically.
+
+After the job starts, see the tunnel command with:
+
+```bash
+cat "$TEAM_SCRATCH/.iag/$USER/port_forwarding_command.code"
+```
+
+If the job says `code-server is not available`, use JupyterLab or ask the support team to make `code-server` available as a module or on `PATH`.
+
+If port `8080` is already in use on your laptop, choose another local port:
+
+```bash
+iag-code --gpus 1 --port 8081
+```
+
+## 9. Submit A Batch Job
 
 Use the sample scripts in `samples/`:
 
@@ -153,6 +191,7 @@ Use the sample scripts in `samples/`:
 iag-submit samples/gpu-smoke-test.sbatch
 iag-submit samples/python-venv-job.sbatch
 iag-submit samples/docker-job.sbatch
+iag-submit samples/code-server.sbatch
 ```
 
 Check your jobs:
@@ -167,7 +206,7 @@ Cancel a job:
 iag-cancel <jobid>
 ```
 
-## 9. Use Rootless Docker On Compute Nodes
+## 10. Use Rootless Docker On Compute Nodes
 
 Docker is available only on compute nodes, inside a Slurm allocation. The provided helper commands and sample scripts start it automatically.
 
@@ -183,7 +222,7 @@ fi
 docker info
 ```
 
-## 10. Copy Data
+## 11. Copy Data
 
 From your laptop to the cluster:
 
@@ -203,7 +242,7 @@ From the cluster back to your laptop:
 rsync -avP <UNIQUE_AXIS_HASH>@ssh.axisapps.io:/lustre/fs01/hackathons/teams/iag-team<N>/outputs/ ./outputs/
 ```
 
-## 11. Minimal Slurm Cheat Sheet
+## 12. Minimal Slurm Cheat Sheet
 
 You only need these commands most of the time:
 

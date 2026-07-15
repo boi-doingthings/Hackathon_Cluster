@@ -7,6 +7,7 @@
 #SBATCH --output=slurm-%j.out
 
 set -euo pipefail
+umask 0007
 
 TEAM="${IAG_TEAM:-}"
 if [[ -z "$TEAM" ]]; then
@@ -20,7 +21,13 @@ fi
 
 TEAM_SCRATCH="${TEAM_SCRATCH:-/lustre/fs01/hackathons/teams/${TEAM}}"
 PROJECT_DIR="${PROJECT_DIR:-${TEAM_SCRATCH}/example-python-job}"
-VENV_DIR="${VENV_DIR:-${TEAM_SCRATCH}/venvs/example-python}"
+RUNTIME_DIR="${TEAM_SCRATCH}/.iag/${USER:-user}"
+VENV_DIR="${VENV_DIR:-${RUNTIME_DIR}/venvs/example-python}"
+
+mkdir -p "$RUNTIME_DIR/venvs" "$RUNTIME_DIR/cache/uv" "$RUNTIME_DIR/cache/pip"
+chmod -R g+rwX "${TEAM_SCRATCH}/.iag" 2>/dev/null || true
+export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
+export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
 
 module load rootless-docker
 if command -v start_rootless_docker >/dev/null 2>&1; then

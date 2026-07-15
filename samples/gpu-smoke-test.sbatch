@@ -7,6 +7,7 @@
 #SBATCH --output=slurm-%j.out
 
 set -euo pipefail
+umask 0007
 
 echo "Host: $(hostname -f 2>/dev/null || hostname)"
 echo "Job id: ${SLURM_JOB_ID}"

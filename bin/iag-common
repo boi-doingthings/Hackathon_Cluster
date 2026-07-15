@@ -10,6 +10,7 @@ IAG_TEAM_ROOT="${IAG_TEAM_ROOT:-/lustre/fs01/hackathons/teams}"
 IAG_LOGIN_HOST="${IAG_LOGIN_HOST:-ssh.axisapps.io}"
 IAG_JUPYTER_EXTERNAL_PORT="${IAG_JUPYTER_EXTERNAL_PORT:-8001}"
 IAG_JUPYTER_VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
+IAG_CODE_EXTERNAL_PORT="${IAG_CODE_EXTERNAL_PORT:-8080}"
 
 iag_die() {
     echo "error: $*" >&2
@@ -61,7 +62,7 @@ iag_context() {
     echo "Team storage: ${scratch:-not detected; set TEAM_SCRATCH=/lustre/fs01/hackathons/teams/iag-team<N>}"
 }
 
-iag_logs_dir() {
+iag_workspace_dir() {
     local team
     local scratch
 
@@ -69,8 +70,37 @@ iag_logs_dir() {
     scratch="$(iag_team_scratch "$team" || true)"
 
     if [[ -n "$scratch" && -d "$scratch" && -w "$scratch" ]]; then
-        mkdir -p "$scratch/logs"
-        echo "$scratch/logs"
+        echo "$scratch"
+    else
+        echo "$PWD"
+    fi
+}
+
+iag_runtime_dir() {
+    local workspace="$1"
+    local state_root
+    local runtime_dir
+
+    state_root="${workspace}/.iag"
+    runtime_dir="${state_root}/${USER:-user}"
+    mkdir -p "$state_root"
+    mkdir -p "$runtime_dir"
+    chmod 2770 "$state_root" 2>/dev/null || true
+    chmod 2770 "$runtime_dir" 2>/dev/null || true
+    echo "$runtime_dir"
+}
+
+iag_logs_dir() {
+    local workspace
+    local runtime_dir
+
+    workspace="$(iag_workspace_dir)"
+
+    if [[ -n "$workspace" && -d "$workspace" && -w "$workspace" ]]; then
+        runtime_dir="$(iag_runtime_dir "$workspace")"
+        mkdir -p "$runtime_dir/logs"
+        chmod 2770 "$runtime_dir/logs" 2>/dev/null || true
+        echo "$runtime_dir/logs"
     else
         mkdir -p "$PWD/logs"
         echo "$PWD/logs"

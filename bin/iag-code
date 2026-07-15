@@ -8,10 +8,10 @@ source "$SCRIPT_DIR/iag-common"
 
 usage() {
     cat <<'EOF'
-Usage: iag-jupyter [--gpus 1|2|3|4] [--time HH:MM:SS] [--partition NAME] [--cpus N] [--mem SIZE] [--port PORT]
+Usage: iag-code [--gpus 1|2|3|4] [--time HH:MM:SS] [--partition NAME] [--cpus N] [--mem SIZE] [--port PORT]
 
-Submit a Slurm job that creates/uses a JupyterLab virtualenv on a GPU compute node.
-Rootless Docker is started automatically.
+Submit a Slurm job that starts code-server on a GPU compute node.
+The editor opens in the team fast-storage directory. Rootless Docker is started automatically.
 Memory is not requested by default; pass --mem only if you need a specific amount.
 EOF
 }
@@ -21,7 +21,7 @@ time_limit="$IAG_DEFAULT_TIME"
 partition="$IAG_DEFAULT_PARTITION"
 cpus="$IAG_DEFAULT_CPUS"
 mem="$IAG_DEFAULT_MEM"
-external_port="$IAG_JUPYTER_EXTERNAL_PORT"
+external_port="$IAG_CODE_EXTERNAL_PORT"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -39,23 +39,21 @@ done
 iag_validate_gpus "$gpus"
 iag_need_cmd sbatch
 
-team="$(iag_detect_team)"
-scratch="$(iag_team_scratch "$team" || true)"
-logs_dir="$(iag_logs_dir)"
-output_file="${logs_dir}/jupyter-%j.out"
 workdir="$(iag_workspace_dir)"
 runtime_dir="$(iag_runtime_dir "$workdir")"
+logs_dir="$(iag_logs_dir)"
+output_file="${logs_dir}/code-%j.out"
 
 args=(
     --parsable
-    --job-name "iag-jupyter"
+    --job-name "iag-code"
     --partition "$partition"
     --gres "gpu:${gpus}"
     --cpus-per-task "$cpus"
     --time "$time_limit"
     --chdir "$workdir"
     --output "$output_file"
-    --export "ALL,IAG_JUPYTER_EXTERNAL_PORT=${external_port},IAG_LOGIN_HOST=${IAG_LOGIN_HOST},IAG_JUPYTER_VENV_NAME=${IAG_JUPYTER_VENV_NAME},IAG_RUNTIME_DIR=${runtime_dir}"
+    --export "ALL,IAG_CODE_EXTERNAL_PORT=${external_port},IAG_LOGIN_HOST=${IAG_LOGIN_HOST},IAG_RUNTIME_DIR=${runtime_dir}"
 )
 
 if [[ -n "$mem" ]]; then
@@ -68,30 +66,23 @@ jobid="$(
 set -euo pipefail
 umask 0007
 
-EXTERNAL_PORT="${IAG_JUPYTER_EXTERNAL_PORT:-8001}"
+EXTERNAL_PORT="${IAG_CODE_EXTERNAL_PORT:-8080}"
 LOGIN_HOST="${IAG_LOGIN_HOST:-ssh.axisapps.io}"
-VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
 RUNTIME_DIR="${IAG_RUNTIME_DIR:-${PWD}/.iag/${USER:-user}}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
 mkdir -p \
-    "${RUNTIME_DIR}/venvs" \
-    "${RUNTIME_DIR}/jupyter/config" \
-    "${RUNTIME_DIR}/jupyter/data" \
-    "${RUNTIME_DIR}/jupyter/runtime" \
-    "${RUNTIME_DIR}/ipython" \
-    "${RUNTIME_DIR}/cache/uv" \
-    "${RUNTIME_DIR}/cache/pip"
+    "${RUNTIME_DIR}/code-server/config" \
+    "${RUNTIME_DIR}/code-server/data" \
+    "${RUNTIME_DIR}/code-server/extensions" \
+    "${RUNTIME_DIR}/cache"
 chmod -R g+rwX "${RUNTIME_DIR}" 2>/dev/null || true
 
-export JUPYTER_CONFIG_DIR="${RUNTIME_DIR}/jupyter/config"
-export JUPYTER_DATA_DIR="${RUNTIME_DIR}/jupyter/data"
-export JUPYTER_RUNTIME_DIR="${RUNTIME_DIR}/jupyter/runtime"
-export IPYTHONDIR="${RUNTIME_DIR}/ipython"
-export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
-export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
+export XDG_CONFIG_HOME="${RUNTIME_DIR}/code-server/config"
+export XDG_DATA_HOME="${RUNTIME_DIR}/code-server/data"
+export XDG_CACHE_HOME="${RUNTIME_DIR}/cache"
 
 while true; do
-    PORT="$(shuf -n 1 -i 9000-9999)"
+    PORT="$(shuf -n 1 -i 10000-10999)"
     if command -v ss >/dev/null 2>&1; then
         ss -ltn | awk '{print $4}' | grep -q ":${PORT}$" || break
     elif command -v netstat >/dev/null 2>&1; then
@@ -101,9 +92,9 @@ while true; do
     fi
 done
 
-echo "Jupyter job started"
+echo "VS Code job started"
 echo "Node: ${NODE}"
-echo "Internal Jupyter port: ${PORT}"
+echo "Internal code-server port: ${PORT}"
 echo "Local browser port: ${EXTERNAL_PORT}"
 echo "Workspace: ${PWD}"
 echo "GPUs visible:"
@@ -120,22 +111,14 @@ fi
 docker version --format "Docker Client: {{.Client.Version}} Server: {{.Server.Version}}" || docker version
 echo
 
-echo "Preparing Jupyter virtual environment..."
-module load uv
-VENV_DIR="${RUNTIME_DIR}/venvs/${VENV_NAME}"
-if [[ ! -d "${VENV_DIR}" ]]; then
-    uv venv "${VENV_DIR}"
+if ! command -v code-server >/dev/null 2>&1; then
+    echo "code-server is not available in this environment." >&2
+    echo "Ask the support team to install code-server as a module or put it on PATH." >&2
+    exit 127
 fi
-source "${VENV_DIR}/bin/activate"
-if ! command -v jupyter >/dev/null 2>&1; then
-    uv pip install --upgrade pip
-    uv pip install jupyterlab
-fi
-echo "Jupyter venv: ${VENV_DIR}"
-echo
 
 HASHNUMBER="${UNIQUE_AXIS_HASH:-${USER:-<UNIQUE_AXIS_HASH>}}"
-TUNNEL_FILE="${RUNTIME_DIR}/port_forwarding_command.jupyter"
+TUNNEL_FILE="${RUNTIME_DIR}/port_forwarding_command.code"
 echo "From your laptop, run:"
 echo "ssh -L localhost:${EXTERNAL_PORT}:${NODE}:${PORT} ${LOGIN_HOST} -l ${HASHNUMBER}"
 echo
@@ -146,20 +129,20 @@ echo "ssh -L localhost:${EXTERNAL_PORT}:${NODE}:${PORT} ${LOGIN_HOST} -l ${HASHN
 echo "Port forwarding command was also written to: ${TUNNEL_FILE}"
 echo
 
-exec jupyter lab \
-    --no-browser \
-    --allow-root \
-    --ip=0.0.0.0 \
-    --port="${PORT}" \
-    --ServerApp.token="" \
-    --NotebookApp.token="" \
-    --notebook-dir="${PWD}"
+export PASSWORD="${IAG_CODE_PASSWORD:-}"
+exec code-server \
+    --bind-addr "0.0.0.0:${PORT}" \
+    --auth none \
+    --disable-telemetry \
+    --user-data-dir "${RUNTIME_DIR}/code-server/data" \
+    --extensions-dir "${RUNTIME_DIR}/code-server/extensions" \
+    "${PWD}"
 SBATCH
 )"
 
 resolved_output="${output_file//%j/$jobid}"
 
-echo "Submitted Jupyter job: $jobid"
+echo "Submitted VS Code job: $jobid"
 echo "Log file: $resolved_output"
 echo
 echo "Watch startup logs with:"

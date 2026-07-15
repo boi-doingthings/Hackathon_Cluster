@@ -59,6 +59,7 @@ echo
 cat > "$job_script" <<'SBATCH'
 #!/bin/bash -l
 set -euo pipefail
+umask 0007
 
 echo "Compute-node checks"
 echo "-------------------"
@@ -76,6 +77,9 @@ if [[ -n "${TEAM_SCRATCH:-}" ]]; then
     test -w "${TEAM_SCRATCH}"
     cd "${TEAM_SCRATCH}"
     echo "Writable team storage: yes"
+    mkdir -p ".iag/${USER:-user}/logs" ".iag/${USER:-user}/venvs"
+    chmod 2770 ".iag" ".iag/${USER:-user}" ".iag/${USER:-user}/logs" ".iag/${USER:-user}/venvs" 2>/dev/null || true
+    echo "Per-user runtime directory: ${TEAM_SCRATCH}/.iag/${USER:-user}"
 else
     echo "TEAM_SCRATCH is not set"
 fi
@@ -102,6 +106,15 @@ echo "UV module:"
 module load uv
 uv --version
 echo
+
+echo "code-server:"
+if command -v code-server >/dev/null 2>&1; then
+    code-server --version
+else
+    echo "code-server not found; iag-code will need code-server on PATH or as a module"
+fi
+echo
+
 echo "Healthcheck complete"
 SBATCH
 

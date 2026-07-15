@@ -7,6 +7,7 @@
 #SBATCH --output=slurm-%j.out
 
 set -euo pipefail
+umask 0007
 
 TEAM="${IAG_TEAM:-}"
 if [[ -z "$TEAM" ]]; then
