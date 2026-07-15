@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=bin/iag-common
+source "$SCRIPT_DIR/iag-common"
+
+usage() {
+    cat <<'EOF'
+Usage: iag-submit <script.sbatch> [script args...]
+
+Submit a batch script to Slurm.
+EOF
+}
+
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
+iag_need_cmd sbatch
+
+script="$1"
+shift
+
+[[ -f "$script" ]] || iag_die "script not found: $script"
+
+jobid="$(sbatch --parsable "$script" "$@")"
+echo "Submitted job: $jobid"
+echo
+echo "Check status with:"
+echo "iag-status"

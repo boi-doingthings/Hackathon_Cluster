@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=bin/iag-common
+source "$SCRIPT_DIR/iag-common"
+
+usage() {
+    cat <<'EOF'
+Usage: iag-status
+
+Show cluster status and your Slurm jobs.
+EOF
+}
+
+if [[ $# -gt 0 ]]; then
+    case "$1" in
+        -h|--help) usage; exit 0 ;;
+        *) iag_die "unknown option: $1" ;;
+    esac
+fi
+
+iag_need_cmd sinfo
+iag_need_cmd squeue
+
+echo "Cluster summary:"
+sinfo
+echo
+echo "Your jobs:"
+squeue -u "${USER:-$(id -un)}" -o "%.18i %.9P %.30j %.8u %.2t %.10M %.10l %.6D %R"

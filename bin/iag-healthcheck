@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=bin/iag-common
+source "$SCRIPT_DIR/iag-common"
+
+usage() {
+    cat <<'EOF'
+Usage: iag-healthcheck [--partition NAME] [--time HH:MM:SS]
+
+Run login-node checks and a tiny 1 GPU Slurm job to verify the basics.
+EOF
+}
+
+partition="$IAG_DEFAULT_PARTITION"
+time_limit="00:10:00"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --partition) partition="${2:-}"; shift 2 ;;
+        --time) time_limit="${2:-}"; shift 2 ;;
+        -h|--help) usage; exit 0 ;;
+        *) iag_die "unknown option: $1" ;;
+    esac
+done
+
+iag_need_cmd sinfo
+iag_need_cmd squeue
+iag_need_cmd sbatch
+
+team="$(iag_detect_team)"
+scratch="$(iag_team_scratch "$team" || true)"
+logs_dir="$(iag_logs_dir)"
+output_file="${logs_dir}/healthcheck-%j.out"
+job_script="${TMPDIR:-/tmp}/iag-healthcheck-${USER:-user}-$$.sbatch"
+
+echo "Login-node checks"
+echo "-----------------"
+iag_context
+echo
+echo "Slurm:"
+sinfo
+echo
+
+if [[ -z "$team" ]]; then
+    echo "warning: team group was not detected; set IAG_TEAM=iag-team<N> if needed" >&2
+fi
+
+if [[ -n "$scratch" && -d "$scratch" ]]; then
+    echo "Team storage exists: $scratch"
+else
+    echo "warning: team storage was not found: ${scratch:-unknown}" >&2
+fi
+echo
+
+cat > "$job_script" <<'SBATCH'
+#!/bin/bash -l
+set -euo pipefail
+
+echo "Compute-node checks"
+echo "-------------------"
+echo "Host: $(hostname -f 2>/dev/null || hostname)"
+echo "User: ${USER:-unknown}"
+echo
+
+echo "GPU visibility:"
+nvidia-smi -L
+echo
+
+if [[ -n "${TEAM_SCRATCH:-}" ]]; then
+    echo "Team storage: ${TEAM_SCRATCH}"
+    test -d "${TEAM_SCRATCH}"
+    test -w "${TEAM_SCRATCH}"
+    cd "${TEAM_SCRATCH}"
+    echo "Writable team storage: yes"
+else
+    echo "TEAM_SCRATCH is not set"
+fi
+echo
+
+echo "Rootless Docker:"
+if command -v module >/dev/null 2>&1; then
+    module load rootless-docker
+else
+    echo "module command not found" >&2
+    exit 1
+fi
+
+if command -v start_rootless_docker >/dev/null 2>&1; then
+    start_rootless_docker
+else
+    start_rootless_docker.sh
+fi
+docker info >/dev/null
+docker version
+echo
+
+echo "UV module:"
+module load uv
+uv --version
+echo
+echo "Healthcheck complete"
+SBATCH
+
+export TEAM_SCRATCH="$scratch"
+
+echo "Submitting tiny 1 GPU healthcheck job..."
+jobid="$(
+    sbatch --parsable \
+        --job-name "iag-healthcheck" \
+        --partition "$partition" \
+        --gres "gpu:1" \
+        --cpus-per-task 4 \
+        --mem 16G \
+        --time "$time_limit" \
+        --output "$output_file" \
+        --export "ALL,TEAM_SCRATCH=${TEAM_SCRATCH:-}" \
+        "$job_script"
+)"
+
+resolved_output="${output_file//%j/$jobid}"
+echo "Job id: $jobid"
+echo "Log file: $resolved_output"
+echo "Waiting for healthcheck job to finish..."
+
+while squeue -h -j "$jobid" >/dev/null 2>&1 && [[ -n "$(squeue -h -j "$jobid")" ]]; do
+    sleep 5
+done
+
+echo
+echo "Healthcheck job output"
+echo "----------------------"
+if [[ -f "$resolved_output" ]]; then
+    cat "$resolved_output"
+else
+    echo "Log file was not found yet: $resolved_output" >&2
+    echo "Try: tail -f $resolved_output" >&2
+fi
+
+rm -f "$job_script"

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=bin/iag-common
+source "$SCRIPT_DIR/iag-common"
+
+usage() {
+    cat <<'EOF'
+Usage: iag-cancel <jobid> [jobid...]
+
+Cancel one or more of your Slurm jobs.
+EOF
+}
+
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
+iag_need_cmd scancel
+exec scancel "$@"

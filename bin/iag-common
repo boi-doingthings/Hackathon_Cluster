@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+IAG_DEFAULT_PARTITION="${IAG_PARTITION:-primary}"
+IAG_DEFAULT_TIME="${IAG_TIME:-04:00:00}"
+IAG_DEFAULT_CPUS="${IAG_CPUS:-16}"
+IAG_DEFAULT_MEM="${IAG_MEM:-128G}"
+IAG_TEAM_ROOT="${IAG_TEAM_ROOT:-/lustre/fs01/hackathons/teams}"
+IAG_LOGIN_HOST="${IAG_LOGIN_HOST:-ssh.axisapps.io}"
+IAG_JUPYTER_EXTERNAL_PORT="${IAG_JUPYTER_EXTERNAL_PORT:-8001}"
+IAG_JUPYTER_VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
+
+iag_die() {
+    echo "error: $*" >&2
+    exit 1
+}
+
+iag_need_cmd() {
+    command -v "$1" >/dev/null 2>&1 || iag_die "missing required command: $1"
+}
+
+iag_detect_team() {
+    if [[ -n "${IAG_TEAM:-}" ]]; then
+        echo "$IAG_TEAM"
+        return 0
+    fi
+
+    id -Gn 2>/dev/null | tr ' ' '\n' | grep -E '^iag-team[0-9]+$' | head -n 1 || true
+}
+
+iag_team_scratch() {
+    local team="${1:-}"
+
+    if [[ -n "${TEAM_SCRATCH:-}" ]]; then
+        echo "$TEAM_SCRATCH"
+        return 0
+    fi
+
+    [[ -n "$team" ]] || return 1
+    echo "${IAG_TEAM_ROOT}/${team}"
+}
+
+iag_validate_gpus() {
+    local gpus="$1"
+    case "$gpus" in
+        1|2|3|4) ;;
+        *) iag_die "--gpus must be one of: 1, 2, 3, 4" ;;
+    esac
+}
+
+iag_context() {
+    local team
+    local scratch
+
+    team="$(iag_detect_team)"
+    scratch="$(iag_team_scratch "$team" || true)"
+
+    echo "User: ${USER:-unknown}"
+    echo "Team: ${team:-not detected; set IAG_TEAM=iag-team<N>}"
+    echo "Team storage: ${scratch:-not detected; set TEAM_SCRATCH=/lustre/fs01/hackathons/teams/iag-team<N>}"
+}
+
+iag_logs_dir() {
+    local team
+    local scratch
+
+    team="$(iag_detect_team)"
+    scratch="$(iag_team_scratch "$team" || true)"
+
+    if [[ -n "$scratch" && -d "$scratch" && -w "$scratch" ]]; then
+        mkdir -p "$scratch/logs"
+        echo "$scratch/logs"
+    else
+        mkdir -p "$PWD/logs"
+        echo "$PWD/logs"
+    fi
+}

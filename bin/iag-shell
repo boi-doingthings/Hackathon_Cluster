@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=bin/iag-common
+source "$SCRIPT_DIR/iag-common"
+
+usage() {
+    cat <<'EOF'
+Usage: iag-shell [--gpus 1|2|3|4] [--time HH:MM:SS] [--partition NAME] [--cpus N] [--mem SIZE]
+
+Start an interactive shell on a Slurm compute node. Rootless Docker is started automatically.
+EOF
+}
+
+gpus=1
+time_limit="$IAG_DEFAULT_TIME"
+partition="$IAG_DEFAULT_PARTITION"
+cpus="$IAG_DEFAULT_CPUS"
+mem="$IAG_DEFAULT_MEM"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --gpus) gpus="${2:-}"; shift 2 ;;
+        --time) time_limit="${2:-}"; shift 2 ;;
+        --partition) partition="${2:-}"; shift 2 ;;
+        --cpus) cpus="${2:-}"; shift 2 ;;
+        --mem) mem="${2:-}"; shift 2 ;;
+        -h|--help) usage; exit 0 ;;
+        *) iag_die "unknown option: $1" ;;
+    esac
+done
+
+iag_validate_gpus "$gpus"
+iag_need_cmd srun
+
+echo "Requesting interactive Slurm shell..."
+echo "GPUs: $gpus"
+echo "CPUs: $cpus"
+echo "Memory: $mem"
+echo "Time: $time_limit"
+echo "Partition: $partition"
+echo
+iag_context
+echo
+
+exec srun \
+    --partition "$partition" \
+    --gres "gpu:${gpus}" \
+    --cpus-per-task "$cpus" \
+    --mem "$mem" \
+    --time "$time_limit" \
+    --pty bash -lc '
+        set -euo pipefail
+        echo "Compute node: $(hostname -f 2>/dev/null || hostname)"
+        echo "Loading rootless Docker..."
+        module load rootless-docker
+        if command -v start_rootless_docker >/dev/null 2>&1; then
+            start_rootless_docker
+        else
+            start_rootless_docker.sh
+        fi
+        echo "Docker is ready:"
+        docker version --format "Client: {{.Client.Version}} Server: {{.Server.Version}}" || docker version
+        echo
+        exec bash -l
+    '
