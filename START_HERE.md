@@ -50,6 +50,12 @@ cd "$TEAM_SCRATCH"
 
 If you are testing with an admin or personal account that is not in an `iag-team<N>` group, set `TEAM_SCRATCH` explicitly before starting JupyterLab or VS Code.
 
+Check what the helper scripts resolve with:
+
+```bash
+iag-storage
+```
+
 Put datasets, checkpoints, notebooks, and cloned repos under this directory.
 
 The helper scripts start in this team directory by default so teammates can collaborate in the same fast-storage workspace. Per-user runtime files such as virtual environments, logs, and tunnel commands are stored under:

@@ -61,6 +61,71 @@ iag_detect_writable_team_scratch() {
     return 1
 }
 
+iag_workspace_dir() {
+    local team
+    local scratch
+
+    if [[ -n "${TEAM_SCRATCH:-}" ]]; then
+        scratch="$TEAM_SCRATCH"
+    else
+        team="$(iag_detect_team)"
+        if [[ -n "$team" ]]; then
+            scratch="${IAG_TEAM_ROOT}/${team}"
+        else
+            iag_detect_writable_team_scratch
+            return $?
+        fi
+    fi
+
+    if [[ -d "$scratch" && -w "$scratch" && -x "$scratch" ]]; then
+        echo "$scratch"
+        return 0
+    fi
+
+    return 1
+}
+
+iag_workspace_diagnostics() {
+    local team
+    local scratch
+    local candidate
+    local count=0
+
+    team="$(iag_detect_team)"
+    scratch="$(iag_team_scratch "$team" || true)"
+
+    echo "Workspace diagnostics:" >&2
+    echo "  USER=${USER:-unknown}" >&2
+    echo "  IAG_TEAM=${IAG_TEAM:-not set}" >&2
+    echo "  detected team group=${team:-not detected}" >&2
+    echo "  TEAM_SCRATCH=${TEAM_SCRATCH:-not set}" >&2
+    echo "  candidate path=${scratch:-not available}" >&2
+
+    if [[ -n "$scratch" ]]; then
+        if [[ -e "$scratch" ]]; then
+            echo "  exists=yes" >&2
+            [[ -d "$scratch" ]] && echo "  is_directory=yes" >&2 || echo "  is_directory=no" >&2
+            [[ -x "$scratch" ]] && echo "  searchable=yes" >&2 || echo "  searchable=no" >&2
+            [[ -w "$scratch" ]] && echo "  writable=yes" >&2 || echo "  writable=no" >&2
+            ls -ld "$scratch" >&2 || true
+        else
+            echo "  exists=no" >&2
+        fi
+    fi
+
+    if [[ -d "$IAG_TEAM_ROOT" ]]; then
+        echo "  writable team directories visible to this account:" >&2
+        for candidate in "$IAG_TEAM_ROOT"/iag-team*; do
+            [[ -d "$candidate" && -w "$candidate" && -x "$candidate" ]] || continue
+            echo "    $candidate" >&2
+            count=$((count + 1))
+        done
+        [[ "$count" -gt 0 ]] || echo "    none" >&2
+    else
+        echo "  team root does not exist or is not visible: $IAG_TEAM_ROOT" >&2
+    fi
+}
+
 iag_validate_gpus() {
     local gpus="$1"
     case "$gpus" in
@@ -79,21 +144,6 @@ iag_context() {
     echo "User: ${USER:-unknown}"
     echo "Team: ${team:-not detected; set IAG_TEAM=iag-team<N>}"
     echo "Team storage: ${scratch:-not detected; set TEAM_SCRATCH=/lustre/fs01/hackathons/teams/iag-team<N>}"
-}
-
-iag_workspace_dir() {
-    local team
-    local scratch
-
-    team="$(iag_detect_team)"
-    scratch="$(iag_team_scratch "$team" || true)"
-
-    if [[ -n "$scratch" && -d "$scratch" && -w "$scratch" && -x "$scratch" ]]; then
-        echo "$scratch"
-        return 0
-    fi
-
-    iag_detect_writable_team_scratch
 }
 
 iag_require_workspace_dir() {
@@ -116,6 +166,8 @@ If you know your team number, you may also set:
 
   export IAG_TEAM=iag-team<N>
 EOF
+    echo >&2
+    iag_workspace_diagnostics
     exit 1
 }
 

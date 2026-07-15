@@ -78,6 +78,7 @@ This keeps five teammates on the same team from colliding over virtual environme
 - `iag-status`: shows cluster status and the current user's jobs.
 - `iag-cancel`: cancels one or more Slurm jobs.
 - `iag-submit`: submits a sample or custom `sbatch` file.
+- `iag-storage`: shows the resolved team storage path and diagnostics.
 
 ## Samples
 

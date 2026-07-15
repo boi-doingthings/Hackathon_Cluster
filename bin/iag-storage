@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=bin/iag-common
+source "$SCRIPT_DIR/iag-common"
+
+usage() {
+    cat <<'EOF'
+Usage: iag-storage
+
+Show how the helper scripts resolve team fast storage for this account.
+EOF
+}
+
+if [[ $# -gt 0 ]]; then
+    case "$1" in
+        -h|--help) usage; exit 0 ;;
+        *) iag_die "unknown option: $1" ;;
+    esac
+fi
+
+workspace="$(iag_workspace_dir || true)"
+
+if [[ -n "$workspace" ]]; then
+    echo "Resolved team workspace: $workspace"
+    echo "Per-user runtime dir: $workspace/.iag/${USER:-user}"
+else
+    iag_workspace_diagnostics
+    exit 1
+fi
