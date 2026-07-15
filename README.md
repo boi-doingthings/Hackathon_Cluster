@@ -32,7 +32,7 @@ Start JupyterLab on a GPU node:
 iag-jupyter --gpus 1
 ```
 
-Start VS Code in the browser, if `code-server` is available:
+Start VS Code in the browser beta:
 
 ```bash
 iag-code --gpus 1
@@ -74,7 +74,7 @@ This keeps five teammates on the same team from colliding over virtual environme
 - `iag-healthcheck`: checks Slurm, team storage, GPU visibility, Docker startup, and `uv`.
 - `iag-shell`: starts an interactive GPU shell and initializes rootless Docker.
 - `iag-jupyter`: starts JupyterLab on a GPU node from team storage.
-- `iag-code`: starts `code-server` on a GPU node from team storage, when available.
+- `iag-code`: beta; starts `code-server` on a GPU node from team storage and installs it into `~/.local` if missing.
 - `iag-status`: shows cluster status and the current user's jobs.
 - `iag-cancel`: cancels one or more Slurm jobs.
 - `iag-submit`: submits a sample or custom `sbatch` file.
@@ -101,5 +101,5 @@ iag-submit samples/gpu-smoke-test.sbatch
 - Memory is not requested by default. Pass `--mem` only if a job needs a specific amount.
 - Docker is started automatically in the provided GPU allocation paths.
 - JupyterLab is installed into a per-user virtual environment on fast storage.
-- `iag-code` requires `code-server` to already be available on the compute node.
+- `iag-code` is beta. If `code-server` is missing, it installs the standalone user version into `~/.local`.
 - If local port `8001` or `8080` is already in use, pass `--port` to `iag-jupyter` or `iag-code`.

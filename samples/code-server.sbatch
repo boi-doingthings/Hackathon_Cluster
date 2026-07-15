@@ -41,6 +41,7 @@ chmod -R g+rwX "${PWD}/.iag" 2>/dev/null || true
 export XDG_CONFIG_HOME="${RUNTIME_DIR}/code-server/config"
 export XDG_DATA_HOME="${RUNTIME_DIR}/code-server/data"
 export XDG_CACHE_HOME="${RUNTIME_DIR}/cache"
+export PATH="${HOME}/.local/bin:${PATH}"
 
 while true; do
     PORT="$(shuf -n 1 -i 10000-10999)"
@@ -73,10 +74,29 @@ docker version
 echo
 
 if ! command -v code-server >/dev/null 2>&1; then
-    echo "code-server is not available in this environment." >&2
-    echo "Ask the support team to install code-server as a module or put it on PATH." >&2
+    echo "code-server was not found on PATH."
+    echo "Installing standalone code-server into ~/.local for ${USER:-this user}..."
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "curl is required to install code-server, but curl was not found." >&2
+        exit 127
+    fi
+    curl -fsSL https://code-server.dev/install.sh | sh -s -- --method=standalone
+    export PATH="${HOME}/.local/bin:${PATH}"
+fi
+
+if ! command -v code-server >/dev/null 2>&1; then
+    echo "code-server install completed but code-server is still not on PATH." >&2
+    echo "Expected it at: ${HOME}/.local/bin/code-server" >&2
     exit 127
 fi
+
+echo "code-server: $(command -v code-server)"
+code-server --version
+echo
+echo "Installing recommended VS Code extensions if needed..."
+code-server --install-extension ms-python.python || echo "warning: failed to install ms-python.python"
+code-server --install-extension ms-toolsai.jupyter || echo "warning: failed to install ms-toolsai.jupyter"
+echo
 
 HASHNUMBER="${UNIQUE_AXIS_HASH:-${USER:-<UNIQUE_AXIS_HASH>}}"
 TUNNEL_FILE="${RUNTIME_DIR}/port_forwarding_command.code"

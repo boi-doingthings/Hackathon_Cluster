@@ -167,9 +167,11 @@ After the job starts, you can also see the tunnel command with:
 cat "$TEAM_SCRATCH/.iag/$USER/port_forwarding_command.jupyter"
 ```
 
-## 8. Start VS Code In The Browser
+## 8. Start VS Code In The Browser Beta
 
-If `code-server` is available on the cluster, start a VS Code-like browser session on a GPU node:
+This path is beta and less tested than JupyterLab.
+
+Start a VS Code-like browser session on a GPU node:
 
 ```bash
 iag-code --gpus 1
@@ -189,13 +191,27 @@ iag-code --gpus 4 --time 08:00:00
 
 The editor opens in your team storage directory. Rootless Docker is started automatically.
 
+If `code-server` is not already installed for your account, `iag-code` installs the standalone user version into:
+
+```bash
+$HOME/.local
+```
+
+The job also adds this to `PATH` for the session:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+It installs the recommended Python and Jupyter extensions on first use.
+
 After the job starts, see the tunnel command with:
 
 ```bash
 cat "$TEAM_SCRATCH/.iag/$USER/port_forwarding_command.code"
 ```
 
-If the job says `code-server is not available`, use JupyterLab or ask the support team to make `code-server` available as a module or on `PATH`.
+If the user-level install fails, use JupyterLab and share the `code-*.out` log with the support team.
 
 If port `8080` is already in use on your laptop, choose another local port:
 

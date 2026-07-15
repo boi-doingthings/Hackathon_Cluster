@@ -107,14 +107,6 @@ module load uv
 uv --version
 echo
 
-echo "code-server:"
-if command -v code-server >/dev/null 2>&1; then
-    code-server --version
-else
-    echo "code-server not found; iag-code will need code-server on PATH or as a module"
-fi
-echo
-
 echo "Healthcheck complete"
 SBATCH
 
