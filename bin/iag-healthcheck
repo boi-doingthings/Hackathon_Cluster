@@ -11,6 +11,7 @@ usage() {
 Usage: iag-healthcheck [--partition NAME] [--time HH:MM:SS]
 
 Run login-node checks and a tiny 1 GPU Slurm job to verify the basics.
+Memory is not requested by default.
 EOF
 }
 
@@ -113,7 +114,6 @@ jobid="$(
         --partition "$partition" \
         --gres "gpu:1" \
         --cpus-per-task 4 \
-        --mem 16G \
         --time "$time_limit" \
         --output "$output_file" \
         --export "ALL,TEAM_SCRATCH=${TEAM_SCRATCH:-}" \

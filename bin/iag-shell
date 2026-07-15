@@ -11,6 +11,7 @@ usage() {
 Usage: iag-shell [--gpus 1|2|3|4] [--time HH:MM:SS] [--partition NAME] [--cpus N] [--mem SIZE]
 
 Start an interactive shell on a Slurm compute node. Rootless Docker is started automatically.
+Memory is not requested by default; pass --mem only if you need a specific amount.
 EOF
 }
 
@@ -38,19 +39,25 @@ iag_need_cmd srun
 echo "Requesting interactive Slurm shell..."
 echo "GPUs: $gpus"
 echo "CPUs: $cpus"
-echo "Memory: $mem"
+echo "Memory: ${mem:-cluster default}"
 echo "Time: $time_limit"
 echo "Partition: $partition"
 echo
 iag_context
 echo
 
-exec srun \
-    --partition "$partition" \
-    --gres "gpu:${gpus}" \
-    --cpus-per-task "$cpus" \
-    --mem "$mem" \
-    --time "$time_limit" \
+args=(
+    --partition "$partition"
+    --gres "gpu:${gpus}"
+    --cpus-per-task "$cpus"
+    --time "$time_limit"
+)
+
+if [[ -n "$mem" ]]; then
+    args+=(--mem "$mem")
+fi
+
+exec srun "${args[@]}" \
     --pty bash -lc '
         set -euo pipefail
         echo "Compute node: $(hostname -f 2>/dev/null || hostname)"

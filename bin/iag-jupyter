@@ -12,6 +12,7 @@ Usage: iag-jupyter [--gpus 1|2|3|4] [--time HH:MM:SS] [--partition NAME] [--cpus
 
 Submit a Slurm job that creates/uses a JupyterLab virtualenv on a GPU compute node.
 Rootless Docker is started automatically.
+Memory is not requested by default; pass --mem only if you need a specific amount.
 EOF
 }
 
@@ -49,18 +50,24 @@ else
     workdir="$PWD"
 fi
 
+args=(
+    --parsable
+    --job-name "iag-jupyter"
+    --partition "$partition"
+    --gres "gpu:${gpus}"
+    --cpus-per-task "$cpus"
+    --time "$time_limit"
+    --chdir "$workdir"
+    --output "$output_file"
+    --export "ALL,IAG_JUPYTER_EXTERNAL_PORT=${external_port},IAG_LOGIN_HOST=${IAG_LOGIN_HOST},IAG_JUPYTER_VENV_NAME=${IAG_JUPYTER_VENV_NAME}"
+)
+
+if [[ -n "$mem" ]]; then
+    args+=(--mem "$mem")
+fi
+
 jobid="$(
-    sbatch --parsable \
-        --job-name "iag-jupyter" \
-        --partition "$partition" \
-        --gres "gpu:${gpus}" \
-        --cpus-per-task "$cpus" \
-        --mem "$mem" \
-        --time "$time_limit" \
-        --chdir "$workdir" \
-        --output "$output_file" \
-        --export "ALL,IAG_JUPYTER_EXTERNAL_PORT=${external_port},IAG_LOGIN_HOST=${IAG_LOGIN_HOST},IAG_JUPYTER_VENV_NAME=${IAG_JUPYTER_VENV_NAME}" \
-        <<'SBATCH'
+    sbatch "${args[@]}" <<'SBATCH'
 #!/bin/bash -l
 set -euo pipefail
 
