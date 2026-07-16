@@ -42,6 +42,35 @@ iag_team_scratch() {
     echo "${IAG_TEAM_ROOT}/${team}"
 }
 
+iag_team_group() {
+    local team
+    local scratch_base
+
+    team="$(iag_detect_team)"
+    if [[ -n "$team" ]]; then
+        echo "$team"
+        return 0
+    fi
+
+    if [[ -n "${TEAM_SCRATCH:-}" ]]; then
+        scratch_base="$(basename "$TEAM_SCRATCH")"
+        if [[ "$scratch_base" =~ ^iag-team[0-9]+$ ]]; then
+            echo "$scratch_base"
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+iag_set_team_group() {
+    local group="${1:-}"
+    shift || true
+
+    [[ -n "$group" ]] || return 0
+    chgrp "$group" "$@" 2>/dev/null || true
+}
+
 iag_detect_writable_team_scratch() {
     local matches=()
     local candidate
@@ -181,9 +210,11 @@ iag_runtime_dir() {
     local workspace="$1"
     local state_root
     local runtime_dir
+    local team_group
 
     state_root="${workspace}/.iag"
     runtime_dir="${state_root}/${USER:-user}"
+    team_group="$(iag_team_group || true)"
 
     if ! mkdir -p "$runtime_dir"; then
         cat >&2 <<EOF
@@ -199,6 +230,7 @@ EOF
         return 1
     fi
 
+    iag_set_team_group "$team_group" "$state_root" "$runtime_dir"
     chmod 2770 "$state_root" 2>/dev/null || true
     chmod 2770 "$runtime_dir" 2>/dev/null || true
     echo "$runtime_dir"
@@ -213,6 +245,7 @@ iag_logs_dir() {
     if [[ -n "$workspace" && -d "$workspace" && -w "$workspace" ]]; then
         runtime_dir="$(iag_runtime_dir "$workspace")" || return 1
         mkdir -p "$runtime_dir/logs" || return 1
+        iag_set_team_group "$(iag_team_group || true)" "$runtime_dir/logs"
         chmod 2770 "$runtime_dir/logs" 2>/dev/null || true
         echo "$runtime_dir/logs"
     else

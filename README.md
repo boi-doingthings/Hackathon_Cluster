@@ -67,6 +67,14 @@ Team directories must allow members of the matching `iag-team<N>` group to creat
 drwxrws--- root iag-team<N> /lustre/fs01/hackathons/teams/iag-team<N>
 ```
 
+If `.iag` was accidentally created with a user's personal group, reset it once:
+
+```bash
+chgrp -R iag-team<N> /lustre/fs01/hackathons/teams/iag-team<N>/.iag
+find /lustre/fs01/hackathons/teams/iag-team<N>/.iag -type d -exec chmod 2770 {} \;
+find /lustre/fs01/hackathons/teams/iag-team<N>/.iag -type f -exec chmod g+rw,o-rwx {} \;
+```
+
 Per-user runtime files live under:
 
 ```bash
