@@ -61,6 +61,12 @@ JupyterLab, VS Code, and interactive shells require a writable team storage path
 
 Shared project files should live directly under `$TEAM_SCRATCH`.
 
+Team directories must allow members of the matching `iag-team<N>` group to create files and directories. A healthy shape is:
+
+```bash
+drwxrws--- root iag-team<N> /lustre/fs01/hackathons/teams/iag-team<N>
+```
+
 Per-user runtime files live under:
 
 ```bash

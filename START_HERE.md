@@ -56,6 +56,8 @@ Check what the helper scripts resolve with:
 iag-storage
 ```
 
+If `iag-storage` cannot create `$TEAM_SCRATCH/.iag/$USER`, ask the support team to fix the team directory permissions. Team members need to be able to create files and directories in their team storage path.
+
 Put datasets, checkpoints, notebooks, and cloned repos under this directory.
 
 The helper scripts start in this team directory by default so teammates can collaborate in the same fast-storage workspace. Per-user runtime files such as virtual environments, logs, and tunnel commands are stored under:

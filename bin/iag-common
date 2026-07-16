@@ -107,6 +107,12 @@ iag_workspace_diagnostics() {
             [[ -d "$scratch" ]] && echo "  is_directory=yes" >&2 || echo "  is_directory=no" >&2
             [[ -x "$scratch" ]] && echo "  searchable=yes" >&2 || echo "  searchable=no" >&2
             [[ -w "$scratch" ]] && echo "  writable=yes" >&2 || echo "  writable=no" >&2
+            if mkdir -p "${scratch}/.iag-permission-test-${USER:-user}-$$" 2>/dev/null; then
+                echo "  can_create_directory=yes" >&2
+                rmdir "${scratch}/.iag-permission-test-${USER:-user}-$$" 2>/dev/null || true
+            else
+                echo "  can_create_directory=no" >&2
+            fi
             ls -ld "$scratch" >&2 || true
         else
             echo "  exists=no" >&2
@@ -178,8 +184,21 @@ iag_runtime_dir() {
 
     state_root="${workspace}/.iag"
     runtime_dir="${state_root}/${USER:-user}"
-    mkdir -p "$state_root"
-    mkdir -p "$runtime_dir"
+
+    if ! mkdir -p "$runtime_dir"; then
+        cat >&2 <<EOF
+error: could not create per-user runtime directory:
+
+  ${runtime_dir}
+
+The team storage path is visible, but this account cannot create directories there.
+Ask the cluster admin to make the team directory group-writable for the iag-team group.
+EOF
+        echo >&2
+        iag_workspace_diagnostics
+        return 1
+    fi
+
     chmod 2770 "$state_root" 2>/dev/null || true
     chmod 2770 "$runtime_dir" 2>/dev/null || true
     echo "$runtime_dir"
@@ -192,8 +211,8 @@ iag_logs_dir() {
     workspace="$(iag_workspace_dir || true)"
 
     if [[ -n "$workspace" && -d "$workspace" && -w "$workspace" ]]; then
-        runtime_dir="$(iag_runtime_dir "$workspace")"
-        mkdir -p "$runtime_dir/logs"
+        runtime_dir="$(iag_runtime_dir "$workspace")" || return 1
+        mkdir -p "$runtime_dir/logs" || return 1
         chmod 2770 "$runtime_dir/logs" 2>/dev/null || true
         echo "$runtime_dir/logs"
     else

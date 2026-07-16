@@ -33,7 +33,10 @@ iag_need_cmd sbatch
 
 team="$(iag_detect_team)"
 scratch="$(iag_team_scratch "$team" || true)"
-logs_dir="$(iag_logs_dir)"
+workdir="$(iag_require_workspace_dir)"
+runtime_dir="$(iag_runtime_dir "$workdir")"
+logs_dir="${runtime_dir}/logs"
+mkdir -p "$logs_dir"
 output_file="${logs_dir}/healthcheck-%j.out"
 job_script="${TMPDIR:-/tmp}/iag-healthcheck-${USER:-user}-$$.sbatch"
 
@@ -110,7 +113,7 @@ echo
 echo "Healthcheck complete"
 SBATCH
 
-export TEAM_SCRATCH="$scratch"
+export TEAM_SCRATCH="$workdir"
 
 echo "Submitting tiny 1 GPU healthcheck job..."
 jobid="$(
