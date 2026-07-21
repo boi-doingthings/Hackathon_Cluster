@@ -129,6 +129,26 @@ The batch job:
 - runs the NeMo-first pipeline;
 - writes `evaluation.json` and `manifest.sha256`.
 
+### Verified full GPU run
+
+The complete 22-PDF corpus was executed on the supplied cluster on 2026-07-22:
+
+| Item | Verified result |
+|---|---|
+| Slurm job | `13372`, `COMPLETED`, exit `0:0`, elapsed `00:01:34` |
+| Node / GPU | `gpu004`, NVIDIA H100 80GB HBM3 |
+| Driver / CUDA / PyTorch | `550.90.07` / `12.4` / `2.6.0+cu124` |
+| CUDA check | `torch.cuda.is_available() == True`; 2048x2048 matrix multiply on `cuda:0` |
+| Tests / lint | 17 Pytest tests passed; Ruff passed |
+| Sources | 22 PDFs, 46,071,807 bytes, each SHA-256 locked |
+| Curated chunks | 3,231 |
+| Grounded synthetic records | 6,462 |
+| Tool-calling records | 200 |
+| Embedding triplets | 2,746 training + 485 validation |
+| Grounding / privacy gates | 100% valid citations, quotes and answer support; 0 duplicates; 0 personal-PII findings |
+
+The run used commit `daa7d0b094af0e62e52b8f97611325b916c83599`. Audit evidence is committed under [`results/gpu-full-13372`](results/gpu-full-13372). The raw PDFs and generated datasets remain in team storage and are intentionally excluded from Git.
+
 ## CLI
 
 ```text
@@ -218,7 +238,7 @@ Every record contains an exact `chunk_id`, URL, page and quoted support:
 | Exact duplicate rate | at most 5% |
 | SSN, MBI-like ID, DOB or personal-email findings | 0 |
 
-Public organizational contact addresses on allowlisted government/Humana domains are not treated as personal email addresses. This is not a replacement for enterprise DLP, privacy counsel or Safe Synthesizer's PII replay analysis.
+Public organizational contact addresses on allowlisted payer, Humana, federal and state-government domains are not treated as personal email addresses. This is not a replacement for enterprise DLP, privacy counsel or Safe Synthesizer's PII replay analysis.
 
 ## NeMo Safe Synthesizer
 

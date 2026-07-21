@@ -1,0 +1,46 @@
+{
+  "verified_at": "2026-07-22T00:04:15Z",
+  "git_commit_executed": "daa7d0b094af0e62e52b8f97611325b916c83599",
+  "slurm": {
+    "job_id": 13372,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:01:34",
+    "node": "gpu004",
+    "source_limit": null
+  },
+  "gpu": {
+    "name": "NVIDIA H100 80GB HBM3",
+    "driver": "550.90.07",
+    "cuda_driver": "12.4",
+    "torch": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_matrix_multiply": "passed"
+  },
+  "quality": {
+    "pytest_tests": 17,
+    "ruff": "passed",
+    "nemo_curator_pipeline": "completed successfully",
+    "evaluation_passed": true
+  },
+  "sources": {
+    "pdf_count": 22,
+    "raw_pdf_bytes": 46071807
+  },
+  "artifacts": {
+    "curated_chunks": 3231,
+    "grounded_records": 6462,
+    "tool_call_records": 200,
+    "embedding_training_triplets": 2746,
+    "embedding_validation_triplets": 485,
+    "checksummed_files": 31
+  },
+  "selected_sha256": {
+    "curated/chunks.jsonl": "1dd4792983b724adfb7ac5190d454d201c30c11f732b8d88405ec32c20dfd907",
+    "synthetic/grounded_synthetic.jsonl": "b0ae69294f3cab0da30057701ba8cf98b9e9c46225a75446fc39c118d3740bb9",
+    "synthetic/tool_calling_openai.jsonl": "f09ea9b068108033bec725a4569fe44a85427eff92e5a06d1122ef9d1dcf2b69",
+    "synthetic/embedding_triplets/training.jsonl": "2c51596678abddc2dc3413c3da4dc3c590d1906a99a81175fbdd7ef9f0a2f30c",
+    "synthetic/embedding_triplets/validation.jsonl": "ae1beb0a047351bbc18b3933b236d2f6aaca01525b4185139e6287e0b0b9699e"
+  },
+  "remote_output": "/lustre/fs01/hackathons/teams/iag-team5/Hackathon_Cluster/humana-grounded-sdg/outputs/gpu-13372"
+}

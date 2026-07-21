@@ -1,0 +1,35 @@
+{
+  "verified_at": "2026-07-21T22:54:35Z",
+  "git_commit": "7b578fa5cecd2e29996953463147acea1eec247e",
+  "slurm": {
+    "job_id": 13368,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:03:04",
+    "node": "gpu004",
+    "source_limit": 1
+  },
+  "gpu": {
+    "name": "NVIDIA H100 80GB HBM3",
+    "driver": "550.90.07",
+    "cuda_driver": "12.4",
+    "torch": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_matrix_multiply": "passed"
+  },
+  "quality": {
+    "pytest_tests": 16,
+    "ruff": "passed",
+    "nemo_curator_pipeline": "completed successfully",
+    "evaluation_passed": true
+  },
+  "artifacts": {
+    "curated_chunks": 143,
+    "grounded_records": 286,
+    "tool_call_records": 200,
+    "embedding_training_triplets": 122,
+    "embedding_validation_triplets": 21,
+    "checksummed_files": 10
+  },
+  "remote_output": "/lustre/fs01/hackathons/teams/iag-team5/Hackathon_Cluster/humana-grounded-sdg/outputs/gpu-13368"
+}
