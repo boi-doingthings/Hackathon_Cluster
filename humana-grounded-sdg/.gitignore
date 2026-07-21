@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+.env
+outputs/
+data/raw/
+data/interim/
+data/curated/
+data/synthetic/
+*.html
+.hermes-tmp.*
