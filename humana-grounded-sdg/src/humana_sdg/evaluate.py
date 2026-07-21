@@ -11,7 +11,14 @@ from humana_sdg.models import GroundingChunk, SyntheticRecord
 
 TOKEN = re.compile(r"[a-z0-9]+")
 EMAIL_PATTERN = re.compile(r"\b[\w.+-]+@([\w.-]+\.[A-Za-z]{2,})\b")
-PUBLIC_CONTACT_DOMAINS = {"humana.com", "cms.gov", "hhs.gov", "cms.hhs.gov"}
+PUBLIC_CONTACT_DOMAINS = {
+    "aetna.com",
+    "cms.gov",
+    "cms.hhs.gov",
+    "hhs.gov",
+    "humana.com",
+    "okhca.org",
+}
 PII_PATTERNS = (
     re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
     re.compile(r"\b[A-Z0-9]{4}-[A-Z0-9]{3}-[A-Z0-9]{4}\b", re.IGNORECASE),
@@ -120,9 +127,14 @@ def _answer_supported_by_quote(answer: str, quote: str) -> bool:
     return bool(quote_tokens) and len(answer_tokens & quote_tokens) / len(quote_tokens) >= 0.8
 
 
+def _is_public_contact_domain(domain: str) -> bool:
+    normalized = domain.casefold()
+    return normalized in PUBLIC_CONTACT_DOMAINS or normalized.endswith(".gov")
+
+
 def _count_pii(text: str) -> int:
     sensitive_emails = sum(
-        1 for match in EMAIL_PATTERN.finditer(text) if match.group(1).casefold() not in PUBLIC_CONTACT_DOMAINS
+        1 for match in EMAIL_PATTERN.finditer(text) if not _is_public_contact_domain(match.group(1))
     )
     return sensitive_emails + sum(len(pattern.findall(text)) for pattern in PII_PATTERNS)
 

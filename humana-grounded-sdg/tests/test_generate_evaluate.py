@@ -52,3 +52,17 @@ def test_evaluation_rejects_unsupported_answer() -> None:
 
     assert not report.passed
     assert report.answer_support_rate == 0.0
+
+
+def test_evaluation_distinguishes_personal_and_public_contact_email() -> None:
+    personal = generate_deterministic_records([_chunk()])[0]
+    personal.answer += " Send the member record to person@example.com."
+    personal_report = evaluate_records([personal], [_chunk()], EvaluationThresholds())
+    assert personal_report.pii_findings == 1
+    assert not personal_report.passed
+
+    public = generate_deterministic_records([_chunk()])[0]
+    public.answer += " Public agency contact: support@jfs.ohio.gov."
+    public_report = evaluate_records([public], [_chunk()], EvaluationThresholds())
+    assert public_report.pii_findings == 0
+    assert public_report.passed
