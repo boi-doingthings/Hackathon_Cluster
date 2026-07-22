@@ -1,0 +1,12 @@
+{
+  "attempted_at_utc": "2026-07-22T09:34:56.037167+00:00",
+  "command": "bash scripts/run_nemo_evaluator_skills.sh",
+  "benchmark": "skills://bfcl_v4",
+  "exit_code": 124,
+  "seconds": 90.059,
+  "nel_on_path": false,
+  "nvidia_api_key_present": false,
+  "stdout": "",
+  "stderr": "scripts/run_nemo_evaluator_skills.sh: line 4: NVIDIA_API_KEY: Set NVIDIA_API_KEY without writing it into this repository\n",
+  "official_evaluator_score_available": false
+}

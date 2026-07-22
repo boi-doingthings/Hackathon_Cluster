@@ -1,0 +1,70 @@
+{
+  "generated_at_utc": "2026-07-22T17:55:46.716706+00:00",
+  "dataset": "humana-support-slm-1200",
+  "conversation_count": 1200,
+  "turn_count": 9600,
+  "passed": true,
+  "rates": {
+    "turn_structure_rate": 1.0,
+    "citation_valid_rate": 1.0,
+    "grounded_quote_rate": 1.0,
+    "safety_compliance_rate": 1.0,
+    "no_personal_pii_rate": 1.0,
+    "unique_rate": 1.0,
+    "duplicate_rate": 0.0,
+    "records_with_public_org_contacts": 105
+  },
+  "local_score_summary": {
+    "note": "Local 0-10 scores are project-computed. NOT official NeMo SQS/DPS.",
+    "quality_mean": 10.0,
+    "quality_min": 10.0,
+    "quality_max": 10.0,
+    "privacy_mean": 10.0,
+    "privacy_min": 10.0,
+    "privacy_max": 10.0,
+    "all_records_have_local_scores": true,
+    "all_records_have_official_sqs_dps": false,
+    "records_with_local_quality_10": 1200,
+    "records_with_local_privacy_10": 1200
+  },
+  "official_nemo_safe_synthesizer": {
+    "sqs_available": false,
+    "dps_available": false,
+    "synthetic_data_quality_score": null,
+    "data_privacy_score": null,
+    "status": "blocked_no_deployed_service",
+    "reason": "No NMP_BASE_URL/token; localhost:8080 Safe Synthesizer API unreachable. Official SQS/DPS remain null (fail-closed, never fabricated)."
+  },
+  "use_case_counts": {
+    "appeals-grievances": 100,
+    "care-management": 100,
+    "claims-billing": 100,
+    "compliance-reporting": 100,
+    "dental-benefits": 100,
+    "eligibility-enrollment": 100,
+    "medicaid-member-support": 100,
+    "pharmacy-benefits": 100,
+    "plan-benefits": 100,
+    "prior-authorization": 100,
+    "privacy-preferences": 100,
+    "provider-directory": 100
+  },
+  "channel_counts": {
+    "chat": 400,
+    "phone-transcript": 400,
+    "secure-message": 400
+  },
+  "persona_counts": {
+    "caregiver": 300,
+    "member": 300,
+    "prospective-member": 300,
+    "provider-office": 300
+  },
+  "outcome_counts": {
+    "current-document-referral": 540,
+    "human-escalation": 297,
+    "information-provided": 363
+  },
+  "failure_count": 0,
+  "failures": []
+}
