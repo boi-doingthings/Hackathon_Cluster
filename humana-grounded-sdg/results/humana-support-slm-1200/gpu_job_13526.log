@@ -1,0 +1,262 @@
+Resolved 225 packages in 3ms
+   Building humana-grounded-sdg @ file:///lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg
+      Built humana-grounded-sdg @ file:///lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg
+Prepared 1 package in 2.05s
+Uninstalled 1 package in 13ms
+Installed 1 package in 59ms
+ - humana-grounded-sdg==0.1.0 (from file:///lustre/fs01/hackathons/teams/iag-team5/Hackathon_Cluster/humana-grounded-sdg)
+ + humana-grounded-sdg==0.1.0 (from file:///lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg)
+Host: gpu004.cm.cluster
+Job: 13526
+Project: /lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg
+Output: /lustre/fs01/hackathons/teams/iag-team5/humana-support-run-f867dab
+Wed Jul 22 12:13:14 2026
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 550.90.07              Driver Version: 550.90.07      CUDA Version: 12.4     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA H100 80GB HBM3          On  |   00000000:2D:00.0 Off |                    0 |
+| N/A   32C    P0             73W /  700W |       1MiB /  81559MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+torch 2.6.0+cu124
+cuda_available True
+gpu_matmul (2048, 2048) cuda:0
+....................sss.........                                         [100%]
+All checks passed!
+2026-07-22 12:13:32.931 | INFO     | nemo_curator.pipeline.pipeline:add_stage:61 - Added stage 'jsonl_reader' to pipeline 'humana-grounding-curation'
+2026-07-22 12:13:32.931 | INFO     | nemo_curator.pipeline.pipeline:add_stage:61 - Added stage 'add_id' to pipeline 'humana-grounding-curation'
+2026-07-22 12:13:32.931 | INFO     | nemo_curator.pipeline.pipeline:add_stage:61 - Added stage 'word_count' to pipeline 'humana-grounding-curation'
+2026-07-22 12:13:32.939 | INFO     | nemo_curator.utils.file_utils:check_output_mode:338 - Removing output directory /lustre/fs01/hackathons/teams/iag-team5/humana-support-run-f867dab/curated/nemo_curator_parts for overwrite mode
+2026-07-22 12:13:32.943 | INFO     | nemo_curator.pipeline.pipeline:add_stage:61 - Added stage 'jsonl_writer' to pipeline 'humana-grounding-curation'
+2026-07-22 12:13:32.943 | INFO     | nemo_curator.pipeline.pipeline:build:70 - Planning pipeline: humana-grounding-curation
+2026-07-22 12:13:32.943 | INFO     | nemo_curator.pipeline.pipeline:_decompose_stages:106 - Decomposing composite stage: jsonl_reader
+2026-07-22 12:13:32.943 | INFO     | nemo_curator.pipeline.pipeline:_decompose_stages:120 - Expanded 'jsonl_reader' into 2 execution stages
+2026-07-22 12:13:33.165 | INFO     | nemo_curator.backends.xenna.executor:execute:135 - Execution mode: STREAMING
+2026-07-22 12:13:41,279	INFO worker.py:2015 -- Started a local Ray instance. View the dashboard at [1m[32mhttp://127.0.0.1:8265 [39m[22m
+2026-07-22 12:13:41,287	INFO packaging.py:425 -- Ignoring upload to cluster for these files: [PosixPath('/lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg/.gitignore')]
+2026-07-22 12:13:41,348	INFO packaging.py:425 -- Ignoring upload to cluster for these files: [PosixPath('/lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg/.pytest_cache/.gitignore')]
+2026-07-22 12:13:41,371	INFO packaging.py:425 -- Ignoring upload to cluster for these files: [PosixPath('/lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg/.ruff_cache/.gitignore')]
+2026-07-22 12:13:41,406	INFO packaging.py:796 -- Creating a file package for local module '/lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg'.
+2026-07-22 12:13:41,407	INFO packaging.py:425 -- Ignoring upload to cluster for these files: [PosixPath('/lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg/.gitignore')]
+2026-07-22 12:13:41,442	INFO packaging.py:425 -- Ignoring upload to cluster for these files: [PosixPath('/lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg/.pytest_cache/.gitignore')]
+2026-07-22 12:13:41,465	INFO packaging.py:425 -- Ignoring upload to cluster for these files: [PosixPath('/lustre/fs01/hackathons/teams/iag-team5/humana-support-f867dab/humana-grounded-sdg/.ruff_cache/.gitignore')]
+2026-07-22 12:13:41,479	INFO packaging.py:496 -- Pushing file package 'gcs://_ray_pkg_ba43f0e469b29bf7.zip' (0.66MiB) to Ray cluster...
+2026-07-22 12:13:41,483	INFO packaging.py:509 -- Successfully pushed file package 'gcs://_ray_pkg_ba43f0e469b29bf7.zip'.
+2026-07-22 12:13:53.686 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=0.5, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:53.686 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:53.686 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:53.686 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:53.686 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:53.686 | INFO     | cosmos_xenna.pipelines.private.pipelines:run_pipeline:472 - PipelineSpec:
+  config: PipelineConfig(execution_mode=<ExecutionMode.STREAMING: 0>, num_setup_attempts_python=1, num_run_attempts_python=1, max_setup_failure_percentage=None, ignore_failures=False, reset_workers_on_failure=False, slots_per_actor=2, enable_work_stealing=False, max_tasks_to_poll_per_chunk=8, worker_max_lifetime_m=0, worker_restart_interval_m=1, logging_interval_s=60, failures_return_nones=False, return_last_stage_outputs=True, actor_pool_verbosity_level=<VerbosityLevel.INFO: 1>, monitoring_verbosity_level=<VerbosityLevel.INFO: 1>, mode_specific=StreamingSpecificSpec(autoscale_interval_s=180, autoscale_speed_estimation_window_duration_s=180.0, autoscale_speed_estimation_min_data_points=5, max_queued_multiplier=1.0, max_queued_lower_bound=8, autoscaler_verbosity_level=<VerbosityLevel.INFO: 1>, executor_verbosity_level=<VerbosityLevel.INFO: 1>), log_worker_allocation_layout=True, cpu_allocation_percentage=0.95, clear_cuda_visible_devices_on_cpu_actors=True)
+  job_info: None
+  serving_queues: None
+  Stage 0:
+   class_name: FilePartitioningStage
+   required_resources: Resources(cpus=0.5, gpus=0, is_spmd=false)
+      num_workers: None
+      num_workers_per_node: 1
+      num_setup_attempts_python: 1
+      num_run_attempts_python: 1
+      ignore_failures: False
+      reset_workers_on_failure: False
+      slots_per_actor: 2
+      worker_max_lifetime_m: 0
+      worker_restart_interval_m: 1
+      max_setup_failure_percentage: None
+      over_provision_factor: None
+  Stage 1:
+   class_name: JsonlReaderStage
+   required_resources: Resources(cpus=1, gpus=0, is_spmd=false)
+      num_workers: None
+      num_workers_per_node: None
+      num_setup_attempts_python: 1
+      num_run_attempts_python: 1
+      ignore_failures: False
+      reset_workers_on_failure: False
+      slots_per_actor: 2
+      worker_max_lifetime_m: 0
+      worker_restart_interval_m: 1
+      max_setup_failure_percentage: None
+      over_provision_factor: None
+  Stage 2:
+   class_name: AddId
+   required_resources: Resources(cpus=1, gpus=0, is_spmd=false)
+      num_workers: None
+      num_workers_per_node: None
+      num_setup_attempts_python: 1
+      num_run_attempts_python: 1
+      ignore_failures: False
+      reset_workers_on_failure: False
+      slots_per_actor: 2
+      worker_max_lifetime_m: 0
+      worker_restart_interval_m: 1
+      max_setup_failure_percentage: None
+      over_provision_factor: None
+  Stage 3:
+   class_name: ScoreFilter
+   required_resources: Resources(cpus=1, gpus=0, is_spmd=false)
+      num_workers: None
+      num_workers_per_node: None
+      num_setup_attempts_python: 1
+      num_run_attempts_python: 1
+      ignore_failures: False
+      reset_workers_on_failure: False
+      slots_per_actor: 2
+      worker_max_lifetime_m: 0
+      worker_restart_interval_m: 1
+      max_setup_failure_percentage: None
+      over_provision_factor: None
+  Stage 4:
+   class_name: JsonlWriter
+   required_resources: Resources(cpus=1, gpus=0, is_spmd=false)
+      num_workers: None
+      num_workers_per_node: None
+      num_setup_attempts_python: 1
+      num_run_attempts_python: 1
+      ignore_failures: False
+      reset_workers_on_failure: False
+      slots_per_actor: 2
+      worker_max_lifetime_m: 0
+      worker_restart_interval_m: 1
+      max_setup_failure_percentage: None
+      over_provision_factor: None
+
+2026-07-22 12:13:53.686 | INFO     | cosmos_xenna.pipelines.private.pipelines:run_pipeline:474 - Initialized Ray cluster.
+2026-07-22 12:13:53,791	INFO worker.py:1847 -- Calling ray.init() again after it has already been called.
+2026-07-22 12:13:53.791 | INFO     | cosmos_xenna.ray_utils.cluster:init_or_connect_to_cluster:95 - Ray dashboard url: 127.0.0.1:8265
+[33m(raylet)[0m    Building humana-grounded-sdg @ file:///tmp/ray/session_2026-07-22_12-13-33_369754_3944815/runtime_resources/working_dir_files/_ray_pkg_ba43f0e469b29bf7
+[33m(raylet)[0m       Built humana-grounded-sdg @ file:///tmp/ray/session_2026-07-22_12-13-33_369754_3944815/runtime_resources/working_dir_files/_ray_pkg_ba43f0e469b29bf7
+[33m(raylet)[0m Uninstalled 1 package in 4ms
+[33m(raylet)[0m Installed 1 package in 22ms
+[36m(_get_node_info_from_current_node pid=3958753)[0m 2026-07-22 12:13:55.951 | WARNING  | cosmos_xenna.pipelines.private.resources:get_local_gpu_info:625 - pynvml is not installed. Assuming no GPUs.
+2026-07-22 12:13:56.159 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=0.5, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.160 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.160 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.160 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.160 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.160 | INFO     | cosmos_xenna.pipelines.private.pipelines:run_pipeline:484 - Cluster resources: ClusterResources(nodes={'1c348df9eafbf162480f31756599dcd295ea0040928ca4df8867447e': NodeResources(used_cpus=0.0, total_cpus=212, gpus=[], name='1c348df9eafbf162480f31756599dcd295ea0040928ca4df8867447e')})
+2026-07-22 12:13:56.160 | INFO     | cosmos_xenna.pipelines.private.pipelines:run_pipeline:485 - Created/connected to cluster with resources: PoolOfResources(cpus=212, gpus=0)
+2026-07-22 12:13:56.160 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=0.5, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.160 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.160 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.161 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.161 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.161 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=0.5, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.161 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=0.5, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.161 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.161 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=0.5, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:56.162 | INFO     | nemo_curator.backends.xenna.adapter:required_resources:71 - Resources: Resources(cpus=1.0, gpu_memory_gb=0.0, gpus=0.0)
+2026-07-22 12:13:57.759 | INFO     | cosmos_xenna.pipelines.private.monitoring:update:339 - Pipeline stats:
+Pipeline Stats:
+Pipeline duration: 0.026587510108947755 minutes
+Number of initial input samples: 1
+Number of input samples remaining: 1
+Streaming pipeline main loop rate: 0
+
+Cluster Resources:
+╒══════════════════════════╤═════════╤═════════════╕
+│ Resource                 │   Total │   Available │
+╞══════════════════════════╪═════════╪═════════════╡
+│ CPUs                     │  224    │      223    │
+├──────────────────────────┼─────────┼─────────────┤
+│ GPUs                     │    1    │        1    │
+├──────────────────────────┼─────────┼─────────────┤
+│ Memory (GB)              │ 1945.35 │     1945.35 │
+├──────────────────────────┼─────────┼─────────────┤
+│ Object Store Memory (GB) │  200    │      200    │
+╘══════════════════════════╧═════════╧═════════════╛
+
+Resource Usage by Stage:
+╒══════════════════════════════════╤═════════╤═══════════════╤═══════════════╤════════════════════╤══════════════════════════╕
+│ Stage                            │   CPU % │   Memory (GB) │   Actor Count │   CPU % per worker │   Memory (GB) per worker │
+╞══════════════════════════════════╪═════════╪═══════════════╪═══════════════╪════════════════════╪══════════════════════════╡
+│ Stage 00 - FilePartitioningStage │       0 │             0 │             0 │                  0 │                        0 │
+├──────────────────────────────────┼─────────┼───────────────┼───────────────┼────────────────────┼──────────────────────────┤
+│ Stage 01 - JsonlReaderStage      │       0 │             0 │             0 │                  0 │                        0 │
+├──────────────────────────────────┼─────────┼───────────────┼───────────────┼────────────────────┼──────────────────────────┤
+│ Stage 02 - AddId                 │       0 │             0 │             0 │                  0 │                        0 │
+├──────────────────────────────────┼─────────┼───────────────┼───────────────┼────────────────────┼──────────────────────────┤
+│ Stage 03 - ScoreFilter           │       0 │             0 │             0 │                  0 │                        0 │
+├──────────────────────────────────┼─────────┼───────────────┼───────────────┼────────────────────┼──────────────────────────┤
+│ Stage 04 - JsonlWriter           │       0 │             0 │             0 │                  0 │                        0 │
+╘══════════════════════════════════╧═════════╧═══════════════╧═══════════════╧════════════════════╧══════════════════════════╛
+
+Stage state:
+╒══════════════════════════════════╤═══════════╤═══════════╤═══════════╤═══════════╤═══════════╤═════════════╤═════════════════╤══════════════╤═══════════════╤════════════╤═════════════╤═════════════════╕
+│ Stage                            │   Actors: │   Actors: │   Actors: │   Actors: │   Actors: │      Tasks: │          Tasks: │       Queue: │        Queue: │     Slots: │      Slots: │ Speed:          │
+│                                  │    Target │   Pending │     Ready │   Running │      Idle │   Completed │   Returned None │   Input Size │   Output Size │   Num Used │   Num Empty │ Tasks/actor/s   │
+╞══════════════════════════════════╪═══════════╪═══════════╪═══════════╪═══════════╪═══════════╪═════════════╪═════════════════╪══════════════╪═══════════════╪════════════╪═════════════╪═════════════════╡
+│ Stage 00 - FilePartitioningStage │         0 │         0 │         0 │         0 │         0 │           0 │               0 │            0 │             0 │          0 │           0 │                 │
+├──────────────────────────────────┼───────────┼───────────┼───────────┼───────────┼───────────┼─────────────┼─────────────────┼──────────────┼───────────────┼────────────┼─────────────┼─────────────────┤
+│ Stage 01 - JsonlReaderStage      │         0 │         0 │         0 │         0 │         0 │           0 │               0 │            0 │             0 │          0 │           0 │                 │
+├──────────────────────────────────┼───────────┼───────────┼───────────┼───────────┼───────────┼─────────────┼─────────────────┼──────────────┼───────────────┼────────────┼─────────────┼─────────────────┤
+│ Stage 02 - AddId                 │         0 │         0 │         0 │         0 │         0 │           0 │               0 │            0 │             0 │          0 │           0 │                 │
+├──────────────────────────────────┼───────────┼───────────┼───────────┼───────────┼───────────┼─────────────┼─────────────────┼──────────────┼───────────────┼────────────┼─────────────┼─────────────────┤
+│ Stage 03 - ScoreFilter           │         0 │         0 │         0 │         0 │         0 │           0 │               0 │            0 │             0 │          0 │           0 │                 │
+├──────────────────────────────────┼───────────┼───────────┼───────────┼───────────┼───────────┼─────────────┼─────────────────┼──────────────┼───────────────┼────────────┼─────────────┼─────────────────┤
+│ Stage 04 - JsonlWriter           │         0 │         0 │         0 │         0 │         0 │           0 │               0 │            0 │             0 │          0 │           0 │                 │
+╘══════════════════════════════════╧═══════════╧═══════════╧═══════════╧═══════════╧═══════════╧═════════════╧═════════════════╧══════════════╧═══════════════╧════════════╧═════════════╧═════════════════╛
+2026-07-22 12:13:57.763 | WARNING  | cosmos_xenna.pipelines.private.streaming:apply_autoscale_result_if_ready:380 - Applying autoscale results took 1.5924866199493408 seconds
+[36m(Stage 00 - FilePartitioningStage pid=3959746)[0m Using blocking ray.get inside async actor. This blocks the event loop. Please use `await` on object ref with asyncio.gather if you want to yield execution to the event loop instead.
+2026-07-22 12:14:35.676 | INFO     | cosmos_xenna.pipelines.private.streaming:run_pipeline:811 - Stopping stages 0
+[36m(Stage 00 - FilePartitioningStage pid=3959746)[0m 2026-07-22 12:14:35.669 | INFO     | nemo_curator.stages.file_partitioning:process:122 - Found 1 files
+[36m(Stage 00 - FilePartitioningStage pid=3959746)[0m 2026-07-22 12:14:35.669 | INFO     | nemo_curator.stages.file_partitioning:process:192 - Created 1 file groups from 1 files
+2026-07-22 12:14:35.938 | INFO     | cosmos_xenna.pipelines.private.streaming:run_pipeline:811 - Stopping stages 1
+2026-07-22 12:14:39.031 | INFO     | cosmos_xenna.pipelines.private.streaming:run_pipeline:811 - Stopping stages 2
+[36m(Stage 03 - ScoreFilter pid=3960399)[0m Using blocking ray.get inside async actor. This blocks the event loop. Please use `await` on object ref with asyncio.gather if you want to yield execution to the event loop instead.[32m [repeated 3x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)[0m
+2026-07-22 12:14:41.626 | INFO     | cosmos_xenna.pipelines.private.streaming:run_pipeline:811 - Stopping stages 3
+2026-07-22 12:14:43.000 | INFO     | cosmos_xenna.pipelines.private.streaming:run_pipeline:811 - Stopping stages 4
+2026-07-22 12:14:43.058 | INFO     | cosmos_xenna.pipelines.private.streaming:run_pipeline:818 - All stages are done. Finishing pipeline.
+2026-07-22 12:14:43.090 | INFO     | nemo_curator.backends.xenna.executor:execute:151 - Pipeline completed successfully with 1 output tasks
+[36m(Stage 04 - JsonlWriter pid=3960641)[0m Using blocking ray.get inside async actor. This blocks the event loop. Please use `await` on object ref with asyncio.gather if you want to yield execution to the event loop instead.
+{
+  "workspace": "/lustre/fs01/hackathons/teams/iag-team5/humana-support-run-f867dab",
+  "records": "/lustre/fs01/hackathons/teams/iag-team5/humana-support-run-f867dab/synthetic/grounded_synthetic.jsonl",
+  "support_conversations": "/lustre/fs01/hackathons/teams/iag-team5/humana-support-run-f867dab/synthetic/support_conversations.jsonl",
+  "support_openai_sft": "/lustre/fs01/hackathons/teams/iag-team5/humana-support-run-f867dab/synthetic/support_sft_openai.jsonl",
+  "evaluation_passed": true,
+  "record_count": 6462,
+  "conversation_evaluation_passed": true,
+  "conversation_count": 1200,
+  "conversation_use_cases": {
+    "appeals-grievances": 100,
+    "care-management": 100,
+    "claims-billing": 100,
+    "compliance-reporting": 100,
+    "dental-benefits": 100,
+    "eligibility-enrollment": 100,
+    "medicaid-member-support": 100,
+    "pharmacy-benefits": 100,
+    "plan-benefits": 100,
+    "prior-authorization": 100,
+    "privacy-preferences": 100,
+    "provider-directory": 100
+  }
+}
+Uninstalled 1 package in 11ms
+Installed 1 package in 40ms
+checksummed_files=34
+PIPELINE_COMPLETE output=/lustre/fs01/hackathons/teams/iag-team5/humana-support-run-f867dab

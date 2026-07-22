@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "attempted_at": "2026-07-22T09:45:06Z",
+  "safe_synthesizer_sdk": {
+    "nemo-platform": null,
+    "nemo-safe-synthesizer": null
+  },
+  "input_conversations": 1000,
+  "endpoint_configuration": {
+    "NMP_BASE_URL_present": false,
+    "NMP_WORKSPACE_present": false,
+    "NMP_ACCESS_TOKEN_present": false
+  },
+  "safe_synthesizer": {
+    "invocation_attempted": true,
+    "official_sdk_endpoint_path": "/apis/safe-synthesizer/v2/workspaces/default/jobs",
+    "status": "blocked_no_deployed_service",
+    "http_status": 404,
+    "synthetic_data_quality_score": null,
+    "data_privacy_score": null,
+    "reason": "The cluster default http://localhost:8080 does not expose the Safe Synthesizer API and no NMP endpoint/token was configured."
+  },
+  "nemo_evaluator": {
+    "status": "blocked_no_evaluator_plugin_or_model_endpoint",
+    "service_output_produced": false,
+    "reason": "The NeMo Platform SDK reported that the evaluator plugin could not be loaded; no deployed customer-support SLM endpoint was configured."
+  },
+  "integrity_note": "SQS and DPS remain null rather than being replaced with project heuristics. They must come from an authenticated Safe Synthesizer service job summary."
+}

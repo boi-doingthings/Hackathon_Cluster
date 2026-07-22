@@ -1,0 +1,18 @@
+{
+  "record_count": 6462,
+  "citation_count": 6462,
+  "citation_valid_rate": 1.0,
+  "grounded_quote_rate": 1.0,
+  "answer_support_rate": 1.0,
+  "duplicate_rate": 0.0,
+  "pii_findings": 0,
+  "task_type_counts": {
+    "grounded_qa": 2962,
+    "claims_billing": 2124,
+    "coverage_explanation": 1210,
+    "prior_authorization": 106,
+    "appeals_grievances": 60
+  },
+  "passed": true,
+  "failures": []
+}

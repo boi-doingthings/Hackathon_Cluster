@@ -1,0 +1,25 @@
+{
+  "conversation_count": 1200,
+  "turn_count": 7200,
+  "citation_count": 1200,
+  "citation_valid_rate": 1.0,
+  "grounded_quote_rate": 1.0,
+  "role_alternation_rate": 1.0,
+  "human_verification_rate": 1.0,
+  "duplicate_rate": 0.0,
+  "pii_findings": 0,
+  "use_case_counts": {
+    "appeals_grievances": 120,
+    "benefits_eligibility": 120,
+    "claims_billing": 120,
+    "community_corporate_impact": 120,
+    "compliance_fraud_waste_abuse": 120,
+    "medicaid_provider_support": 120,
+    "medicare_basics": 120,
+    "pharmacy_part_d": 120,
+    "privacy_data_rights": 120,
+    "provider_network": 120
+  },
+  "passed": true,
+  "failures": []
+}

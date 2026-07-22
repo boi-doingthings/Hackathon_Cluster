@@ -1,0 +1,200 @@
+[
+  {
+    "source_id": "humana_provider_delegated_2026",
+    "url": "https://assets.humana.com/is/content/humana/FINAL_773902ALL0725-A_2026_ProviderManual-Delegated_formattedpdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_provider_delegated_2026.pdf",
+    "sha256": "3af46c91fd378b5fdffb729c99f63c56de98df58e8452df032b0623e73bd264f",
+    "byte_count": 821496,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:50.409800+00:00"
+  },
+  {
+    "source_id": "humana_provider_nondelegated_2025",
+    "url": "https://assets.humana.com/is/content/humana/FINAL589003ALL1024_2025_ProviderManualNonDelegatedpdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_provider_nondelegated_2025.pdf",
+    "sha256": "91ff61446fe09cf9782fbbd36945f07270894ef3aceb5588e7dcc2d1af16d95a",
+    "byte_count": 991494,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:50.986846+00:00"
+  },
+  {
+    "source_id": "humana_ok_provider_2025",
+    "url": "https://assets.humana.com/is/content/humana/2025%20OK%20Provider%20Manual%206-11-2025pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_ok_provider_2025.pdf",
+    "sha256": "b793e50e8b6f66284667f614347ae4dbd71a39ad1624439c937d55a3becd230d",
+    "byte_count": 1458268,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:51.401880+00:00"
+  },
+  {
+    "source_id": "humana_sc_provider_2025",
+    "url": "https://assets.humana.com/is/content/humana/2025_SC_Provider_Manualpdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_sc_provider_2025.pdf",
+    "sha256": "50d8b0606228243551d85f5ca42db977a2b17bbb6c902b0fd129b72c98910455",
+    "byte_count": 1958561,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:51.837441+00:00"
+  },
+  {
+    "source_id": "humana_ky_provider_2025",
+    "url": "https://assets.humana.com/is/content/humana/2025_KY_Provider_Manualpdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_ky_provider_2025.pdf",
+    "sha256": "609a9ead2af39adaafada8c81173ecd20bee08975c8a91a660d8c71a3ea415e3",
+    "byte_count": 4533504,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:52.642165+00:00"
+  },
+  {
+    "source_id": "humana_oh_provider_2025",
+    "url": "https://assets.humana.com/is/content/humana/2025_OH_Provider_Manualpdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_oh_provider_2025.pdf",
+    "sha256": "6e96770cf967c607c5ac0654d977961cf7c88e0a3e1c066f0dbc5d060a1d5579",
+    "byte_count": 1191841,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:52.979930+00:00"
+  },
+  {
+    "source_id": "humana_dsnp_billing_guide",
+    "url": "https://assets.humana.com/is/content/humana/HMO%20D-SNP%20Provider%20Billing%20Guidepdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_dsnp_billing_guide.pdf",
+    "sha256": "6de6229af478914326ba3231134e7eacb37bc0c378261080ce7c31d22425232e",
+    "byte_count": 959820,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:53.249972+00:00"
+  },
+  {
+    "source_id": "humana_dental_office_2026",
+    "url": "https://assets.humana.com/is/content/humana/Dental%20Office%20Handbook%202026pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_dental_office_2026.pdf",
+    "sha256": "a19d15580309282f98318b972f5f6c5e82d07e8a28f25e937c98529bc57b909d",
+    "byte_count": 803837,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:53.461493+00:00"
+  },
+  {
+    "source_id": "humana_prior_auth_2026_07",
+    "url": "https://assets.humana.com/is/content/humana/July%202026%20Medicare%20Prior%20Authorization%20Listpdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_prior_auth_2026_07.pdf",
+    "sha256": "d88647d2ed40aa74ce49e5a2dd1cf364ddd23829323fd7bec339d1e77172e957",
+    "byte_count": 730797,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:53.715619+00:00"
+  },
+  {
+    "source_id": "humana_part_b_step_therapy_2026",
+    "url": "https://assets.humana.com/is/content/humana/2026%20Part%20B%20step%20therapy%20preferred%20drug%20listpdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_part_b_step_therapy_2026.pdf",
+    "sha256": "6578568f019bbe368800f449d562378c01614e52df72bb6f9618de9d207bec6f",
+    "byte_count": 677274,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:53.917577+00:00"
+  },
+  {
+    "source_id": "humana_prescriber_quick_ref",
+    "url": "https://assets.humana.com/is/content/humana/Prescriber%20Quick%20Reference%20Guidepdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_prescriber_quick_ref.pdf",
+    "sha256": "437f1bb4aff1e78d89dc5e4ce325085eb20d7e86f7e1467de078bf4036030a80",
+    "byte_count": 131582,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:54.079467+00:00"
+  },
+  {
+    "source_id": "humana_eoc_h5619_152_2026",
+    "url": "https://assets.humana.com/is/content/humana/H5619152000EOC26pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_eoc_h5619_152_2026.pdf",
+    "sha256": "9fffc570b09768b75fc7fdab76c6b5e296e9cd757beb8c560117ec51d7045041",
+    "byte_count": 6337439,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:55.143462+00:00"
+  },
+  {
+    "source_id": "humana_impact_report_2025",
+    "url": "https://assets.humana.com/is/content/humana/2025_Humana_Impact_Reportpdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_impact_report_2025.pdf",
+    "sha256": "65f967cf7f0bdb14e0522dd64dcbcaac39b3155bd291f0153190383139a3df25",
+    "byte_count": 10977291,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:56.711509+00:00"
+  },
+  {
+    "source_id": "humana_compliance_policy",
+    "url": "https://assets.humana.com/is/content/humana/Compliance%20Policypdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_compliance_policy.pdf",
+    "sha256": "9d52a859b8494112909c555dc44e5777a853006456626573baa291d998ba8cdd",
+    "byte_count": 728306,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:56.980674+00:00"
+  },
+  {
+    "source_id": "humana_privacy_policy",
+    "url": "https://assets.humana.com/is/content/humana/Humana%20Privacy%20Policypdf-2",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_privacy_policy.pdf",
+    "sha256": "7e3488a217c24797e301e803998087dcfccd1d50e36ef02d70457acaf2a08acf",
+    "byte_count": 181580,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:57.126075+00:00"
+  },
+  {
+    "source_id": "humana_supplier_code_2026",
+    "url": "https://assets.humana.com/is/content/humana/Humana_Supplier_Code_of_Conduct_2026pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\humana_supplier_code_2026.pdf",
+    "sha256": "03a1b73256ad581b778a21c3659198ee74621a3bd929269c51b4fb15d2da7ed8",
+    "byte_count": 93309,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:57.295152+00:00"
+  },
+  {
+    "source_id": "cms_medicare_and_you_2026",
+    "url": "https://www.medicare.gov/publications/10050-medicare-and-you.pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\cms_medicare_and_you_2026.pdf",
+    "sha256": "d7a341bc3d2d3dab59af746a0875752761e6c2f2dc107d95e9078a23933513d6",
+    "byte_count": 4064150,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:58.052861+00:00"
+  },
+  {
+    "source_id": "cms_claims_manual_ch1",
+    "url": "https://www.cms.gov/Regulations-and-Guidance/Guidance/Manuals/Downloads/clm104c01.pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\cms_claims_manual_ch1.pdf",
+    "sha256": "cb02b00d48ef0b572ca02b4c6375f9f8d55509a9aad3b35463a1a8baed62e02b",
+    "byte_count": 1956747,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:58.517593+00:00"
+  },
+  {
+    "source_id": "cms_benefit_policy_ch1",
+    "url": "https://www.cms.gov/Regulations-and-Guidance/Guidance/Manuals/Downloads/bp102c01.pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\cms_benefit_policy_ch1.pdf",
+    "sha256": "2579dcd1e3359f8749b14c01e0353bbc0bd9d1f2e3b0704346dede02e635b9f0",
+    "byte_count": 695686,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:58.712125+00:00"
+  },
+  {
+    "source_id": "cms_managed_care_ch13",
+    "url": "https://www.cms.gov/Regulations-and-Guidance/Guidance/Manuals/Downloads/mc86c13.pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\cms_managed_care_ch13.pdf",
+    "sha256": "aec8fa4a683a1b3d5a0d7cb6fe78b433258184c7f4f3d2f73e674c2ef717bd55",
+    "byte_count": 17101,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:58.803636+00:00"
+  },
+  {
+    "source_id": "cms_parts_ab_appeals",
+    "url": "https://www.cms.gov/files/document/mln006562-medicare-parts-b-appeals-process.pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\cms_parts_ab_appeals.pdf",
+    "sha256": "c5f9bdc294e1a05ed3ba1c39d450c0e5692be99930e3ed08d3e6cf4fa0eabd57",
+    "byte_count": 5956827,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:59.636931+00:00"
+  },
+  {
+    "source_id": "cms_managed_care_appeals_flow",
+    "url": "https://www.cms.gov/medicare/appeals-and-grievances/mmcag/downloads/managed-care-appeals-flow-chart-.pdf",
+    "path": "outputs\\humana_support_full_local_20260722\\raw\\cms_managed_care_appeals_flow.pdf",
+    "sha256": "ee10fdf13da0c1b405728ee59f38cdae7b71764483061af8700519be729c3c7e",
+    "byte_count": 805153,
+    "content_type": "application/pdf",
+    "retrieved_at": "2026-07-22T09:25:59.823357+00:00"
+  }
+]

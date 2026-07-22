@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-07-22T09:45:06Z",
+  "repository": "Yash-Kavaiya/Hackathon_Cluster",
+  "branch": "feat/humana-nemo-sdg",
+  "executed_commit": "350905ddc9e1e31c89962b436a5bcd2882b62358",
+  "tracked_source_clean_at_submission": true,
+  "slurm": {
+    "job_id": "13506",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:02:07",
+    "node": "gpu004",
+    "gpu_count": 1
+  },
+  "pipeline": {
+    "curation_engine": "nemo",
+    "nemo_curator_version": "1.2.0",
+    "conversation_count": 1200,
+    "turn_count": 7200,
+    "use_case_count": 10,
+    "evaluation_passed": true
+  },
+  "quality": {
+    "citation_valid_rate": 1.0,
+    "grounded_quote_rate": 1.0,
+    "role_alternation_rate": 1.0,
+    "human_verification_rate": 1.0,
+    "duplicate_rate": 0.0,
+    "pii_findings": 0,
+    "use_case_counts": {
+      "appeals_grievances": 120,
+      "benefits_eligibility": 120,
+      "claims_billing": 120,
+      "community_corporate_impact": 120,
+      "compliance_fraud_waste_abuse": 120,
+      "medicaid_provider_support": 120,
+      "medicare_basics": 120,
+      "pharmacy_part_d": 120,
+      "privacy_data_rights": 120,
+      "provider_network": 120
+    }
+  },
+  "artifacts": {
+    "customer_support_transcripts.jsonl": {
+      "sha256": "116803ec5da6fdd5949432011c171607aa3ffaa13151ae015ae4fef19ccc6cdb",
+      "bytes": 3552380,
+      "records": 1200
+    },
+    "conversation_evaluation.json": {
+      "sha256": "b1945f9a51c045f1f1ac1be3f7d10d52b424218b763899031ffa36952de7f1df",
+      "bytes": 642
+    }
+  }
+}
