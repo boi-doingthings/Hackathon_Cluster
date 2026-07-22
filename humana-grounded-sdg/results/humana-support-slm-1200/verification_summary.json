@@ -145,5 +145,17 @@
     "support_sft_openai_sha256": "2cb63dc519c0ff57b19015cb9270862454e7c2252a495519569e4ee56104619a",
     "log": "gpu_job_13526.log",
     "remote_manifest": "gpu_manifest.sha256"
+  },
+  "diversity": {
+    "unique_cited_chunks": 770,
+    "unique_grounded_quotes": 769,
+    "unique_cited_source_documents": 21,
+    "unique_cited_source_pages": 535,
+    "sentiment_counts": {
+      "concerned": 293,
+      "confused": 412,
+      "frustrated": 228,
+      "neutral": 267
+    }
   }
 }

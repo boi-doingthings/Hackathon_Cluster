@@ -1,6 +1,6 @@
 # Humana Support SLM Synthetic Dataset (1,200 Conversations)
 
-This artifact contains 1,200 deterministic, fully synthetic, eight-turn customer-support conversations grounded in public Humana/CMS documents. It contains no real member data.
+This artifact contains 1,200 deterministic, fully synthetic, eight-turn customer-support conversations grounded in public Humana/CMS documents. It contains no real member data. The release spans 12 balanced use cases, 21 cited source documents, 535 cited source pages, and 770 unique grounding chunks.
 
 ## Files
 
