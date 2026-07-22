@@ -94,9 +94,14 @@ docker info >/dev/null
 docker version
 echo
 
-echo "UV module:"
-module load uv
-uv --version
+echo "Python virtualenv tooling:"
+if command -v uv >/dev/null 2>&1; then
+    uv --version
+else
+    python3 --version
+    python3 -m venv --help >/dev/null
+    echo "python venv: available"
+fi
 echo
 
 echo "Healthcheck complete"

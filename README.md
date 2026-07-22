@@ -79,7 +79,7 @@ This keeps five teammates on the same team from colliding over virtual environme
 
 ## Included Commands
 
-- `iag-healthcheck`: checks Slurm, team storage, GPU visibility, Docker daemon access, and `uv`.
+- `iag-healthcheck`: checks Slurm, team storage, GPU visibility, Docker daemon access, and Python virtualenv tooling.
 - `iag-shell`: starts an interactive GPU shell and checks Docker.
 - `iag-jupyter`: starts JupyterLab on a GPU node from team storage.
 - `iag-code`: beta; starts `code-server` on a GPU node from team storage and installs it into `~/.local` if missing.

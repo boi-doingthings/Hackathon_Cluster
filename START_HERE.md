@@ -99,7 +99,7 @@ It checks:
 - a tiny 1 GPU job can start
 - `nvidia-smi` works on the compute node
 - Docker daemon access works on the compute node
-- the `uv` module is available for virtual environment setup
+- Python virtualenv tooling is available for Jupyter setup
 
 If something fails, share the full output with the support team.
 

@@ -37,16 +37,27 @@ mkdir -p "$PROJECT_DIR"
 cd "$PROJECT_DIR"
 
 if [[ ! -d "$VENV_DIR" ]]; then
-    module load uv
-    uv venv "$VENV_DIR"
+    if command -v uv >/dev/null 2>&1; then
+        uv venv "$VENV_DIR"
+    else
+        python3 -m venv "$VENV_DIR"
+    fi
 fi
 
 source "$VENV_DIR/bin/activate"
-module load uv
-uv pip install --upgrade pip
+if command -v uv >/dev/null 2>&1; then
+    uv pip install --upgrade pip
+else
+    python -m ensurepip --upgrade >/dev/null 2>&1 || true
+    python -m pip install --upgrade pip
+fi
 
 # Replace this with your project requirements.
-uv pip install torch
+if command -v uv >/dev/null 2>&1; then
+    uv pip install torch
+else
+    python -m pip install torch
+fi
 
 echo "Host: $(hostname -f 2>/dev/null || hostname)"
 echo "Project: $PROJECT_DIR"

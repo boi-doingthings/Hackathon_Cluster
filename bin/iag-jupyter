@@ -122,15 +122,27 @@ docker version --format "Docker Client: {{.Client.Version}} Server: {{.Server.Ve
 echo
 
 echo "Preparing Jupyter virtual environment..."
-module load uv
+if ! command -v uv >/dev/null 2>&1 && command -v module >/dev/null 2>&1; then
+    module load uv >/dev/null 2>&1 || true
+fi
 VENV_DIR="${RUNTIME_DIR}/venvs/${VENV_NAME}"
 if [[ ! -d "${VENV_DIR}" ]]; then
-    uv venv "${VENV_DIR}"
+    if command -v uv >/dev/null 2>&1; then
+        uv venv "${VENV_DIR}"
+    else
+        python3 -m venv "${VENV_DIR}"
+    fi
 fi
 source "${VENV_DIR}/bin/activate"
 if ! command -v jupyter >/dev/null 2>&1; then
-    uv pip install --upgrade pip
-    uv pip install jupyterlab
+    if command -v uv >/dev/null 2>&1; then
+        uv pip install --upgrade pip
+        uv pip install jupyterlab
+    else
+        python -m ensurepip --upgrade >/dev/null 2>&1 || true
+        python -m pip install --upgrade pip
+        python -m pip install jupyterlab
+    fi
 fi
 echo "Jupyter venv: ${VENV_DIR}"
 echo
