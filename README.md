@@ -112,6 +112,7 @@ iag-submit samples/gpu-smoke-test.sbatch
 - Memory is not requested by default. Pass `--mem` only if a job needs a specific amount.
 - Docker is available through the compute-node Docker daemon. No `rootless-docker` module is used on Curiosity.
 - The default Curiosity uv module is `py-uv/0.6.8`. Override with `IAG_UV_MODULE` if the module name changes.
+- `iag-shell` and `iag-setup-jupyter` place uv/pip caches under `$TEAM_SCRATCH/.$USER/cache` and use `UV_LINK_MODE=hardlink` to avoid slow cross-filesystem wheel copies.
 - JupyterLab is installed into a per-user virtual environment on team storage. Run `iag-setup-jupyter` once if first-time package downloads are slow from a GPU job.
 - `iag-code` is beta. If `code-server` is missing, it installs the standalone user version into `~/.local`.
 - If local port `8001` or `8080` is already in use, pass `--port` to `iag-jupyter` or `iag-code`.

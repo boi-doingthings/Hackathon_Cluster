@@ -28,8 +28,11 @@ mkdir -p "$RUNTIME_DIR/venvs" "$RUNTIME_DIR/cache/uv" "$RUNTIME_DIR/cache/pip"
 chmod 700 "$RUNTIME_DIR" 2>/dev/null || true
 export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
 export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
+export TMPDIR="${RUNTIME_DIR}/tmp"
 export UV_HTTP_TIMEOUT="${IAG_UV_HTTP_TIMEOUT:-300}"
 export PIP_DEFAULT_TIMEOUT="${IAG_PIP_DEFAULT_TIMEOUT:-300}"
+export UV_LINK_MODE="${IAG_UV_LINK_MODE:-hardlink}"
+mkdir -p "$TMPDIR"
 
 docker info >/dev/null
 docker version

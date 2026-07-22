@@ -43,6 +43,16 @@ if [[ -n "$workspace" ]]; then
 else
     workdir="$(iag_require_workspace_dir)"
 fi
+runtime_dir="$(iag_runtime_dir "$workdir")"
+mkdir -p "${runtime_dir}/cache/uv" "${runtime_dir}/cache/pip" "${runtime_dir}/tmp"
+
+export UV_CACHE_DIR="${runtime_dir}/cache/uv"
+export PIP_CACHE_DIR="${runtime_dir}/cache/pip"
+export TMPDIR="${runtime_dir}/tmp"
+export UV_HTTP_TIMEOUT="${IAG_UV_HTTP_TIMEOUT}"
+export PIP_DEFAULT_TIMEOUT="${IAG_PIP_DEFAULT_TIMEOUT}"
+export UV_LINK_MODE="${IAG_UV_LINK_MODE}"
+export IAG_UV_MODULE
 
 echo "Requesting interactive Slurm shell..."
 echo "GPUs: $gpus"
@@ -77,6 +87,11 @@ exec srun "${args[@]}" \
         docker info >/dev/null
         echo "Docker is ready:"
         docker version --format "Client: {{.Client.Version}} Server: {{.Server.Version}}" || docker version
+        if ! command -v uv >/dev/null 2>&1 && command -v module >/dev/null 2>&1; then
+            module load "${IAG_UV_MODULE}" >/dev/null 2>&1 || module load uv >/dev/null 2>&1 || true
+        fi
+        echo "Python package cache: ${UV_CACHE_DIR}"
+        echo "UV link mode: ${UV_LINK_MODE}"
         echo
         exec bash -l
     '

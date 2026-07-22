@@ -126,6 +126,8 @@ nvidia-smi
 docker version
 ```
 
+The shell also sets uv and pip cache paths under `$TEAM_SCRATCH/.$USER/cache`. If you create your own virtual environments inside team storage, this avoids slow cross-filesystem wheel copies.
+
 Leave the allocation with:
 
 ```bash

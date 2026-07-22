@@ -15,6 +15,7 @@ VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
 UV_MODULE="${IAG_UV_MODULE:-py-uv/0.6.8}"
 UV_HTTP_TIMEOUT="${IAG_UV_HTTP_TIMEOUT:-300}"
 PIP_DEFAULT_TIMEOUT="${IAG_PIP_DEFAULT_TIMEOUT:-300}"
+UV_LINK_MODE="${IAG_UV_LINK_MODE:-hardlink}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
 
 TEAM="${IAG_TEAM:-}"
@@ -42,7 +43,8 @@ mkdir -p \
     "${RUNTIME_DIR}/jupyter/runtime" \
     "${RUNTIME_DIR}/ipython" \
     "${RUNTIME_DIR}/cache/uv" \
-    "${RUNTIME_DIR}/cache/pip"
+    "${RUNTIME_DIR}/cache/pip" \
+    "${RUNTIME_DIR}/tmp"
 chmod 700 "${RUNTIME_DIR}" 2>/dev/null || true
 
 export JUPYTER_CONFIG_DIR="${RUNTIME_DIR}/jupyter/config"
@@ -51,8 +53,10 @@ export JUPYTER_RUNTIME_DIR="${RUNTIME_DIR}/jupyter/runtime"
 export IPYTHONDIR="${RUNTIME_DIR}/ipython"
 export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
 export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
+export TMPDIR="${RUNTIME_DIR}/tmp"
 export UV_HTTP_TIMEOUT
 export PIP_DEFAULT_TIMEOUT
+export UV_LINK_MODE
 
 while true; do
     PORT="$(shuf -n 1 -i 9000-9999)"
