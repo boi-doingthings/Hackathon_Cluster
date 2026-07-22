@@ -13,6 +13,8 @@ EXTERNAL_PORT="${EXTERNAL_PORT:-8001}"
 LOGIN_HOST="${IAG_LOGIN_HOST:-CURIOSITY_LOGIN_HOST_NOT_SET}"
 VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
 UV_MODULE="${IAG_UV_MODULE:-py-uv/0.6.8}"
+UV_HTTP_TIMEOUT="${IAG_UV_HTTP_TIMEOUT:-300}"
+PIP_DEFAULT_TIMEOUT="${IAG_PIP_DEFAULT_TIMEOUT:-300}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
 
 TEAM="${IAG_TEAM:-}"
@@ -49,6 +51,8 @@ export JUPYTER_RUNTIME_DIR="${RUNTIME_DIR}/jupyter/runtime"
 export IPYTHONDIR="${RUNTIME_DIR}/ipython"
 export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
 export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
+export UV_HTTP_TIMEOUT
+export PIP_DEFAULT_TIMEOUT
 
 while true; do
     PORT="$(shuf -n 1 -i 9000-9999)"
@@ -87,13 +91,19 @@ if [[ ! -d "$VENV_DIR" ]]; then
 fi
 source "${VENV_DIR}/bin/activate"
 if ! command -v jupyter >/dev/null 2>&1; then
+    install_status=0
     if command -v uv >/dev/null 2>&1; then
         echo "Using $(uv --version)"
-        uv pip install jupyterlab
+        uv pip install jupyterlab || install_status=$?
     else
         echo "Using $(python --version) with pip"
         python -m ensurepip --upgrade >/dev/null 2>&1 || true
-        python -m pip install jupyterlab
+        python -m pip install jupyterlab || install_status=$?
+    fi
+    if [[ "$install_status" -ne 0 ]]; then
+        echo "JupyterLab installation failed while downloading packages." >&2
+        echo "Try preparing the environment first with: iag-setup-jupyter" >&2
+        exit "$install_status"
     fi
 fi
 echo "Jupyter venv: ${VENV_DIR}"

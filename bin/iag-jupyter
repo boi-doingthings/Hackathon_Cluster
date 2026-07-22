@@ -61,7 +61,7 @@ args=(
     --time "$time_limit"
     --chdir "$workdir"
     --output "$output_file"
-    --export "ALL,IAG_JUPYTER_EXTERNAL_PORT=${external_port},IAG_LOGIN_HOST=${IAG_LOGIN_HOST},IAG_JUPYTER_VENV_NAME=${IAG_JUPYTER_VENV_NAME},IAG_RUNTIME_DIR=${runtime_dir},IAG_UV_MODULE=${IAG_UV_MODULE}"
+    --export "ALL,IAG_JUPYTER_EXTERNAL_PORT=${external_port},IAG_LOGIN_HOST=${IAG_LOGIN_HOST},IAG_JUPYTER_VENV_NAME=${IAG_JUPYTER_VENV_NAME},IAG_RUNTIME_DIR=${runtime_dir},IAG_UV_MODULE=${IAG_UV_MODULE},IAG_UV_HTTP_TIMEOUT=${IAG_UV_HTTP_TIMEOUT},IAG_PIP_DEFAULT_TIMEOUT=${IAG_PIP_DEFAULT_TIMEOUT}"
 )
 
 if [[ -n "$mem" ]]; then
@@ -79,6 +79,8 @@ LOGIN_HOST="${IAG_LOGIN_HOST:-CURIOSITY_LOGIN_HOST_NOT_SET}"
 VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
 RUNTIME_DIR="${IAG_RUNTIME_DIR:-${PWD}/.${USER:-user}}"
 UV_MODULE="${IAG_UV_MODULE:-py-uv/0.6.8}"
+UV_HTTP_TIMEOUT="${IAG_UV_HTTP_TIMEOUT:-300}"
+PIP_DEFAULT_TIMEOUT="${IAG_PIP_DEFAULT_TIMEOUT:-300}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
 mkdir -p \
     "${RUNTIME_DIR}/venvs" \
@@ -96,6 +98,8 @@ export JUPYTER_RUNTIME_DIR="${RUNTIME_DIR}/jupyter/runtime"
 export IPYTHONDIR="${RUNTIME_DIR}/ipython"
 export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
 export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
+export UV_HTTP_TIMEOUT
+export PIP_DEFAULT_TIMEOUT
 
 while true; do
     PORT="$(shuf -n 1 -i 9000-9999)"
@@ -136,13 +140,28 @@ if [[ ! -d "${VENV_DIR}" ]]; then
 fi
 source "${VENV_DIR}/bin/activate"
 if ! command -v jupyter >/dev/null 2>&1; then
+    install_status=0
     if command -v uv >/dev/null 2>&1; then
         echo "Using $(uv --version)"
-        uv pip install jupyterlab
+        uv pip install jupyterlab || install_status=$?
     else
         echo "Using $(python --version) with pip"
         python -m ensurepip --upgrade >/dev/null 2>&1 || true
-        python -m pip install jupyterlab
+        python -m pip install jupyterlab || install_status=$?
+    fi
+    if [[ "$install_status" -ne 0 ]]; then
+        cat >&2 <<EOF
+JupyterLab installation failed, likely while downloading packages from PyPI.
+
+Try preparing the Jupyter environment once from the login node:
+
+  iag-setup-jupyter
+
+Then rerun:
+
+  iag-jupyter --gpus ${SLURM_GPUS_ON_NODE:-1}
+EOF
+        exit "$install_status"
     fi
 fi
 echo "Jupyter venv: ${VENV_DIR}"

@@ -134,6 +134,12 @@ exit
 
 ## 7. Start JupyterLab On GPUs
 
+Prepare your JupyterLab environment once from the login node:
+
+```bash
+iag-setup-jupyter
+```
+
 Submit a Jupyter job:
 
 ```bash
@@ -157,6 +163,8 @@ The command prints the Slurm job id and tells you where the log file will appear
 `iag-jupyter` starts in your team storage directory. It creates a per-user virtual environment under `$TEAM_SCRATCH/.$USER/venvs/iag-jupyter` and installs JupyterLab inside it.
 
 The first launch can take a few minutes while the virtual environment is created. Later launches reuse the same environment.
+
+If the log shows a package download timeout from PyPI, run `iag-setup-jupyter` again from the login node and then rerun `iag-jupyter`.
 
 If your login username is not your Axis hash, set it explicitly before starting Jupyter:
 
