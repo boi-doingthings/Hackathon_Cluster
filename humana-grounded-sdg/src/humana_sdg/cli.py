@@ -6,6 +6,11 @@ from pathlib import Path
 
 import typer
 
+from humana_sdg.conversations import (
+    ConversationEvaluationThresholds,
+    conversations_to_safe_synth_frame,
+    read_conversations_jsonl,
+)
 from humana_sdg.curate import CuratorSettings
 from humana_sdg.nemo_platform_jobs import (
     DataDesignerSettings,
@@ -18,6 +23,7 @@ from humana_sdg.safe_synth import SafeSynthSettings, records_to_safe_synth_frame
 from humana_sdg.workflow import (
     curate_extracted_chunks,
     download_manifest_sources,
+    evaluate_conversation_dataset,
     evaluate_dataset,
     extract_downloaded_pdfs,
     generate_all_datasets,
@@ -80,12 +86,14 @@ def generate(
     output: Path = typer.Option(Path("data/synthetic")),
     records_per_chunk: int = typer.Option(2, min=1, max=3),
     tool_records: int = typer.Option(200, min=1),
+    conversation_records: int = typer.Option(1200, min=1000),
 ) -> None:
     paths = generate_all_datasets(
         curated,
         output,
         records_per_chunk=records_per_chunk,
         tool_records=tool_records,
+        conversation_records=conversation_records,
     )
     typer.echo(json.dumps({key: str(value) for key, value in paths.items()}, indent=2))
 
@@ -97,6 +105,30 @@ def evaluate(
     output: Path = typer.Option(Path("outputs/evaluation.json")),
 ) -> None:
     report = evaluate_dataset(records, curated, output)
+    typer.echo(report.model_dump_json(indent=2))
+    if not report.passed:
+        raise typer.Exit(code=2)
+
+
+@app.command("evaluate-conversations")
+def evaluate_customer_support_conversations(
+    conversations: Path = typer.Option(
+        Path("data/synthetic/customer_support_transcripts.jsonl"), exists=True
+    ),
+    curated: Path = typer.Option(Path("data/curated/chunks.jsonl"), exists=True),
+    output: Path = typer.Option(Path("outputs/conversation_evaluation.json")),
+    min_conversations: int = typer.Option(1000, min=1),
+    min_use_cases: int = typer.Option(8, min=1),
+) -> None:
+    report = evaluate_conversation_dataset(
+        conversations,
+        curated,
+        output,
+        thresholds=ConversationEvaluationThresholds(
+            min_conversations=min_conversations,
+            min_use_cases=min_use_cases,
+        ),
+    )
     typer.echo(report.model_dump_json(indent=2))
     if not report.passed:
         raise typer.Exit(code=2)
@@ -154,6 +186,26 @@ def safe_synthesize(
     typer.echo(run_safe_synthesis(frame, output, settings).model_dump_json(indent=2))
 
 
+@app.command("safe-synthesize-conversations")
+def safe_synthesize_conversations(
+    conversations: Path = typer.Option(
+        Path("data/synthetic/customer_support_transcripts.jsonl"), exists=True
+    ),
+    output: Path = typer.Option(Path("outputs/safe_synth_conversations")),
+    allow_no_holdout: bool = typer.Option(False),
+) -> None:
+    settings = SafeSynthSettings(
+        base_url=os.environ.get("NMP_BASE_URL", "http://localhost:8080"),
+        workspace=os.environ.get("NMP_WORKSPACE", "default"),
+        access_token=os.environ.get("NMP_ACCESS_TOKEN"),
+        provider_name=os.environ.get("NMP_MODEL_PROVIDER", "system/nvidia-build"),
+        hf_secret_name=os.environ.get("NMP_HF_SECRET_NAME"),
+        allow_no_holdout=allow_no_holdout,
+    )
+    frame = conversations_to_safe_synth_frame(read_conversations_jsonl(conversations))
+    typer.echo(run_safe_synthesis(frame, output, settings).model_dump_json(indent=2))
+
+
 @app.command("all")
 def run_all(
     workspace: Path = typer.Option(Path("outputs/run")),
@@ -161,6 +213,8 @@ def run_all(
     engine: str = typer.Option("nemo"),
     limit: int | None = typer.Option(None, min=1),
     records_per_chunk: int = typer.Option(2, min=1, max=3),
+    conversation_records: int = typer.Option(1200, min=1000),
+    min_conversation_use_cases: int = typer.Option(8, min=1),
 ) -> None:
     raw = workspace / "raw"
     interim = workspace / "interim" / "extracted_chunks.jsonl"
@@ -174,8 +228,22 @@ def run_all(
         engine=engine,
         settings=CuratorSettings(),
     )
-    paths = generate_all_datasets(curated, synthetic, records_per_chunk=records_per_chunk)
+    paths = generate_all_datasets(
+        curated,
+        synthetic,
+        records_per_chunk=records_per_chunk,
+        conversation_records=conversation_records,
+    )
     report = evaluate_dataset(paths["grounded_records"], curated, workspace / "evaluation.json")
+    conversation_report = evaluate_conversation_dataset(
+        paths["customer_support_transcripts"],
+        curated,
+        workspace / "conversation_evaluation.json",
+        thresholds=ConversationEvaluationThresholds(
+            min_conversations=conversation_records,
+            min_use_cases=min_conversation_use_cases,
+        ),
+    )
     typer.echo(
         json.dumps(
             {
@@ -183,11 +251,14 @@ def run_all(
                 "records": str(paths["grounded_records"]),
                 "evaluation_passed": report.passed,
                 "record_count": report.record_count,
+                "conversation_evaluation_passed": conversation_report.passed,
+                "conversation_count": conversation_report.conversation_count,
+                "conversation_use_case_counts": conversation_report.use_case_counts,
             },
             indent=2,
         )
     )
-    if not report.passed:
+    if not report.passed or not conversation_report.passed:
         raise typer.Exit(code=2)
 
 
