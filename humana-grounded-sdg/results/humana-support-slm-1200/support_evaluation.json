@@ -1,0 +1,46 @@
+{
+  "conversation_count": 1200,
+  "turn_count": 9600,
+  "average_turn_count": 8.0,
+  "citation_count": 1200,
+  "citation_valid_rate": 1.0,
+  "grounded_quote_rate": 1.0,
+  "turn_structure_rate": 1.0,
+  "safety_compliance_rate": 1.0,
+  "safety_violation_count": 0,
+  "duplicate_rate": 0.0,
+  "pii_findings": 0,
+  "use_case_count": 12,
+  "use_case_counts": {
+    "appeals-grievances": 100,
+    "care-management": 100,
+    "claims-billing": 100,
+    "compliance-reporting": 100,
+    "dental-benefits": 100,
+    "eligibility-enrollment": 100,
+    "medicaid-member-support": 100,
+    "pharmacy-benefits": 100,
+    "plan-benefits": 100,
+    "prior-authorization": 100,
+    "privacy-preferences": 100,
+    "provider-directory": 100
+  },
+  "channel_counts": {
+    "chat": 400,
+    "phone-transcript": 400,
+    "secure-message": 400
+  },
+  "persona_counts": {
+    "member": 300,
+    "caregiver": 300,
+    "provider-office": 300,
+    "prospective-member": 300
+  },
+  "outcome_counts": {
+    "information-provided": 363,
+    "human-escalation": 297,
+    "current-document-referral": 540
+  },
+  "passed": true,
+  "failures": []
+}

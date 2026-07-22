@@ -1,0 +1,16 @@
+{
+  "checked_at_utc": "2026-07-22T10:32:38.885209+00:00",
+  "host": "slogin002",
+  "execution_cluster": "Axis Apps Slurm",
+  "nemo_platform_sdk": "missing",
+  "safe_synthesizer_plugin": "missing",
+  "nemo_evaluator_package": "missing",
+  "nemo_skills_package": "missing",
+  "nel_command": "missing",
+  "nvidia_api_key": "missing",
+  "nmp_base_url": "missing",
+  "nmp_access_token": "missing",
+  "official_safe_synth_scores_available": false,
+  "official_evaluator_score_available": false,
+  "note": "Availability check only; values record presence/missing and never secrets. The GPU pipeline used NeMo Curator, not Safe Synthesizer or NeMo Evaluator."
+}

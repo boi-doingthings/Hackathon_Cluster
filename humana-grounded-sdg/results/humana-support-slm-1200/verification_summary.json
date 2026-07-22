@@ -1,0 +1,149 @@
+{
+  "artifact": "Humana-grounded synthetic customer-support SLM dataset",
+  "generated_at_utc": "2026-07-22T10:26:12.286063+00:00",
+  "generator_commit": "f867dab35545ad3fa0296a66d4f54fdd7c7518d0",
+  "seed": 20260722,
+  "conversation_count": 1200,
+  "sft_record_count": 1200,
+  "turn_count": 9600,
+  "source_document_count": 22,
+  "successful_source_downloads": 22,
+  "curated_chunk_count": 3231,
+  "use_case_counts": {
+    "appeals-grievances": 100,
+    "care-management": 100,
+    "claims-billing": 100,
+    "compliance-reporting": 100,
+    "dental-benefits": 100,
+    "eligibility-enrollment": 100,
+    "medicaid-member-support": 100,
+    "pharmacy-benefits": 100,
+    "plan-benefits": 100,
+    "prior-authorization": 100,
+    "privacy-preferences": 100,
+    "provider-directory": 100
+  },
+  "channel_counts": {
+    "chat": 400,
+    "phone-transcript": 400,
+    "secure-message": 400
+  },
+  "persona_counts": {
+    "caregiver": 300,
+    "member": 300,
+    "prospective-member": 300,
+    "provider-office": 300
+  },
+  "outcome_counts": {
+    "current-document-referral": 540,
+    "human-escalation": 297,
+    "information-provided": 363
+  },
+  "source_counts": {
+    "cms_benefit_policy_ch1": 26,
+    "cms_claims_manual_ch1": 66,
+    "cms_managed_care_appeals_flow": 6,
+    "cms_medicare_and_you_2026": 37,
+    "cms_parts_ab_appeals": 94,
+    "humana_compliance_policy": 86,
+    "humana_dental_office_2026": 105,
+    "humana_dsnp_billing_guide": 4,
+    "humana_eoc_h5619_152_2026": 86,
+    "humana_impact_report_2025": 8,
+    "humana_ky_provider_2025": 46,
+    "humana_oh_provider_2025": 42,
+    "humana_ok_provider_2025": 84,
+    "humana_part_b_step_therapy_2026": 79,
+    "humana_prescriber_quick_ref": 21,
+    "humana_prior_auth_2026_07": 13,
+    "humana_privacy_policy": 100,
+    "humana_provider_delegated_2026": 116,
+    "humana_provider_nondelegated_2025": 96,
+    "humana_sc_provider_2025": 71,
+    "humana_supplier_code_2026": 14
+  },
+  "local_evaluation": {
+    "conversation_count": 1200,
+    "turn_count": 9600,
+    "average_turn_count": 8.0,
+    "citation_count": 1200,
+    "citation_valid_rate": 1.0,
+    "grounded_quote_rate": 1.0,
+    "turn_structure_rate": 1.0,
+    "safety_compliance_rate": 1.0,
+    "safety_violation_count": 0,
+    "duplicate_rate": 0.0,
+    "pii_findings": 0,
+    "use_case_count": 12,
+    "use_case_counts": {
+      "appeals-grievances": 100,
+      "care-management": 100,
+      "claims-billing": 100,
+      "compliance-reporting": 100,
+      "dental-benefits": 100,
+      "eligibility-enrollment": 100,
+      "medicaid-member-support": 100,
+      "pharmacy-benefits": 100,
+      "plan-benefits": 100,
+      "prior-authorization": 100,
+      "privacy-preferences": 100,
+      "provider-directory": 100
+    },
+    "channel_counts": {
+      "chat": 400,
+      "phone-transcript": 400,
+      "secure-message": 400
+    },
+    "persona_counts": {
+      "member": 300,
+      "caregiver": 300,
+      "provider-office": 300,
+      "prospective-member": 300
+    },
+    "outcome_counts": {
+      "information-provided": 363,
+      "human-escalation": 297,
+      "current-document-referral": 540
+    },
+    "passed": true,
+    "failures": []
+  },
+  "deterministic_regeneration_match": true,
+  "official_nemo_safe_synthesizer": {
+    "attempted": true,
+    "official_scores_available": false,
+    "sqs": null,
+    "dps": null,
+    "blocker": "No reachable NeMo Platform Safe Synthesizer service at configured/default endpoint; local attempt received connection refused.",
+    "attempt_exit_code": 1,
+    "evidence_file": "nemo_safe_synth_attempt.json"
+  },
+  "official_nemo_evaluator": {
+    "attempted": true,
+    "official_score_available": false,
+    "benchmark": "skills://bfcl_v4",
+    "blocker": "NeMo Evaluator launcher (nel) and NVIDIA_API_KEY were unavailable in the execution environment.",
+    "attempt_exit_code": 124,
+    "evidence_file": "nemo_evaluator_attempt.json"
+  },
+  "metric_provenance_note": "Local grounding/privacy/safety metrics are not NeMo SQS, DPS, or NeMo Evaluator scores.",
+  "gpu_slurm_verification": {
+    "job_id": 13526,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:01:38",
+    "node": "gpu004",
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "cuda": "12.4",
+    "cuda_matmul_verified": true,
+    "nemo_curator_pipeline_completed": true,
+    "tests": "29 passed, 3 skipped",
+    "ruff": "All checks passed",
+    "conversation_count": 1200,
+    "grounded_record_count": 6462,
+    "support_conversations_sha256": "46d42721a324347f85263f6bfd3fd56a18661c3771d456490c5a9162b5cf60be",
+    "support_sft_openai_sha256": "2cb63dc519c0ff57b19015cb9270862454e7c2252a495519569e4ee56104619a",
+    "log": "gpu_job_13526.log",
+    "remote_manifest": "gpu_manifest.sha256"
+  }
+}
