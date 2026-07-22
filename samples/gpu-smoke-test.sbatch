@@ -14,12 +14,7 @@ echo "Job id: ${SLURM_JOB_ID}"
 echo "CUDA devices: ${CUDA_VISIBLE_DEVICES:-not set}"
 echo
 
-module load rootless-docker
-if command -v start_rootless_docker >/dev/null 2>&1; then
-    start_rootless_docker
-else
-    start_rootless_docker.sh
-fi
+docker info >/dev/null
 docker version
 echo
 

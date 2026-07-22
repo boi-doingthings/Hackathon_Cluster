@@ -92,19 +92,7 @@ else
 fi
 echo
 
-echo "Rootless Docker:"
-if command -v module >/dev/null 2>&1; then
-    module load rootless-docker
-else
-    echo "module command not found" >&2
-    exit 1
-fi
-
-if command -v start_rootless_docker >/dev/null 2>&1; then
-    start_rootless_docker
-else
-    start_rootless_docker.sh
-fi
+echo "Docker daemon:"
 docker info >/dev/null
 docker version
 echo

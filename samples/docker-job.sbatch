@@ -19,17 +19,12 @@ if [[ -z "$TEAM" ]]; then
     exit 1
 fi
 
-TEAM_SCRATCH="${TEAM_SCRATCH:-/lustre/fs01/hackathons/teams/${TEAM}}"
+TEAM_SCRATCH="${TEAM_SCRATCH:-${HOME}/${TEAM}}"
 IMAGE="${IMAGE:-nvcr.io/nvidia/pytorch:24.12-py3}"
 
 cd "$TEAM_SCRATCH"
 
-module load rootless-docker
-if command -v start_rootless_docker >/dev/null 2>&1; then
-    start_rootless_docker
-else
-    start_rootless_docker.sh
-fi
+docker info >/dev/null
 
 echo "Host: $(hostname -f 2>/dev/null || hostname)"
 echo "Image: $IMAGE"

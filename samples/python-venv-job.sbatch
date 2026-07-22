@@ -19,7 +19,7 @@ if [[ -z "$TEAM" ]]; then
     exit 1
 fi
 
-TEAM_SCRATCH="${TEAM_SCRATCH:-/lustre/fs01/hackathons/teams/${TEAM}}"
+TEAM_SCRATCH="${TEAM_SCRATCH:-${HOME}/${TEAM}}"
 PROJECT_DIR="${PROJECT_DIR:-${TEAM_SCRATCH}/example-python-job}"
 RUNTIME_DIR="${TEAM_SCRATCH}/.iag/${USER:-user}"
 VENV_DIR="${VENV_DIR:-${RUNTIME_DIR}/venvs/example-python}"
@@ -31,12 +31,7 @@ chmod 2770 "${TEAM_SCRATCH}/.iag" "$RUNTIME_DIR" 2>/dev/null || true
 export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
 export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
 
-module load rootless-docker
-if command -v start_rootless_docker >/dev/null 2>&1; then
-    start_rootless_docker
-else
-    start_rootless_docker.sh
-fi
+docker info >/dev/null
 docker version
 echo
 

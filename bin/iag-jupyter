@@ -11,7 +11,7 @@ usage() {
 Usage: iag-jupyter [--gpus 1|2|3|4] [--time HH:MM:SS] [--partition NAME] [--cpus N] [--mem SIZE] [--port PORT] [--workspace PATH]
 
 Submit a Slurm job that creates/uses a JupyterLab virtualenv on a GPU compute node.
-Rootless Docker is started automatically.
+Docker is checked automatically.
 Memory is not requested by default; pass --mem only if you need a specific amount.
 EOF
 }
@@ -75,7 +75,7 @@ set -euo pipefail
 umask 0007
 
 EXTERNAL_PORT="${IAG_JUPYTER_EXTERNAL_PORT:-8001}"
-LOGIN_HOST="${IAG_LOGIN_HOST:-ssh.axisapps.io}"
+LOGIN_HOST="${IAG_LOGIN_HOST:-CURIOSITY_LOGIN_HOST_NOT_SET}"
 VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
 RUNTIME_DIR="${IAG_RUNTIME_DIR:-${PWD}/.iag/${USER:-user}}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
@@ -116,13 +116,8 @@ echo "GPUs visible:"
 nvidia-smi -L || true
 echo
 
-echo "Loading rootless Docker..."
-module load rootless-docker
-if command -v start_rootless_docker >/dev/null 2>&1; then
-    start_rootless_docker
-else
-    start_rootless_docker.sh
-fi
+echo "Checking Docker daemon..."
+docker info >/dev/null
 docker version --format "Docker Client: {{.Client.Version}} Server: {{.Server.Version}}" || docker version
 echo
 

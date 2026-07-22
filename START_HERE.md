@@ -1,64 +1,64 @@
-# Hackathon Cluster Start Here
+# Hackathon Cluster Start Here - Curiosity
 
-This cluster uses Slurm to allocate GPU nodes. You do not need to learn Slurm in depth to get started. Use the helper commands in `bin/` for the common workflows.
+Curiosity uses Slurm to allocate GPU nodes. You do not need to learn Slurm in depth to get started. Use the helper commands in `bin/` for the common workflows.
+
+Curiosity is the A100 backup cluster for this hackathon. The important changes from the original cluster are:
+
+- Team storage is visible in your home directory, for example `$HOME/iag-team7`.
+- Docker is already provided by the compute-node Docker daemon.
+- There is no `rootless-docker` module to load.
 
 ## 1. Connect
 
-From your laptop:
+Use the Curiosity SSH command provided by the support team.
 
-```bash
-ssh ssh.axisapps.io -l <UNIQUE_AXIS_HASH>
-```
-
-Optional SSH config entry:
+If you need an SSH config entry, use the host and username shared by the organizers:
 
 ```sshconfig
-Host iag-cluster
-    HostName ssh.axisapps.io
+Host iag-curiosity
+    HostName <CURIOSITY_LOGIN_HOST>
     User <UNIQUE_AXIS_HASH>
 ```
 
 Then connect with:
 
 ```bash
-ssh iag-cluster
+ssh iag-curiosity
 ```
 
-## 2. Add The Helper Commands
+If the support team gives you a direct one-line command, use that instead.
 
-On the cluster login node, from this starter-kit directory:
+## 2. Get The Curiosity Helper Commands
+
+On the Curiosity login node:
 
 ```bash
+git clone -b codex/curiosity-cluster https://github.com/boi-doingthings/Hackathon_Cluster.git
+cd Hackathon_Cluster
 export PATH="$PWD/bin:$PATH"
 ```
 
-## 3. Know Your Team Storage
+## 3. Set Your Team Storage
 
-Each team has a Lustre directory:
+Each team has a shared storage symlink in the home directory:
 
 ```bash
-/lustre/fs01/hackathons/teams/iag-team<N>
+$HOME/iag-team<N>
 ```
 
-The helper scripts try to detect your team from your Linux groups. You can also set it explicitly:
+Set it once per shell. Replace `7` with your team number:
 
 ```bash
 export IAG_TEAM=iag-team7
-export TEAM_SCRATCH=/lustre/fs01/hackathons/teams/$IAG_TEAM
+export TEAM_SCRATCH="$HOME/$IAG_TEAM"
 cd "$TEAM_SCRATCH"
 ```
-
-If you are testing with an admin or personal account that is not in an `iag-team<N>` group, set `TEAM_SCRATCH` explicitly before starting JupyterLab or VS Code.
 
 Check what the helper scripts resolve with:
 
 ```bash
 iag-storage
 ```
-
-If `iag-storage` cannot create `$TEAM_SCRATCH/.iag/$USER`, ask the support team to fix the team directory permissions. Team members need to be able to create files and directories in their team storage path.
-
-If `.iag` already exists but another teammate cannot enter it, the support team needs to reset `.iag` to the `iag-team<N>` group.
 
 Put datasets, checkpoints, notebooks, and cloned repos under this directory.
 
@@ -95,10 +95,10 @@ iag-healthcheck
 It checks:
 
 - Slurm commands are available
-- your team storage is visible
+- your team storage is visible and writable
 - a tiny 1 GPU job can start
 - `nvidia-smi` works on the compute node
-- rootless Docker can be loaded and started
+- Docker daemon access works on the compute node
 - the `uv` module is available for virtual environment setup
 
 If something fails, share the full output with the support team.
@@ -143,7 +143,7 @@ iag-jupyter --gpus 1
 For testing a specific team path:
 
 ```bash
-iag-jupyter --gpus 1 --workspace /lustre/fs01/hackathons/teams/iag-team<N>
+iag-jupyter --gpus 1 --workspace "$HOME/iag-team<N>"
 ```
 
 or:
@@ -154,7 +154,7 @@ iag-jupyter --gpus 4 --time 08:00:00
 
 The command prints the Slurm job id and tells you where the log file will appear. Once the job starts, the log shows the SSH tunnel command and the local browser URL.
 
-`iag-jupyter` starts in your team storage directory. It creates a per-user virtual environment under `$TEAM_SCRATCH/.iag/$USER/venvs/iag-jupyter` and installs JupyterLab inside it. It also starts rootless Docker automatically.
+`iag-jupyter` starts in your team storage directory. It creates a per-user virtual environment under `$TEAM_SCRATCH/.iag/$USER/venvs/iag-jupyter` and installs JupyterLab inside it.
 
 The first launch can take a few minutes while the virtual environment is created. Later launches reuse the same environment.
 
@@ -162,6 +162,13 @@ If your login username is not your Axis hash, set it explicitly before starting 
 
 ```bash
 export UNIQUE_AXIS_HASH=<UNIQUE_AXIS_HASH>
+iag-jupyter --gpus 1
+```
+
+Set the Curiosity SSH gateway before starting Jupyter:
+
+```bash
+export IAG_LOGIN_HOST="<CURIOSITY_LOGIN_HOST>"
 iag-jupyter --gpus 1
 ```
 
@@ -184,7 +191,7 @@ iag-code --gpus 1
 For testing a specific team path:
 
 ```bash
-iag-code --gpus 1 --workspace /lustre/fs01/hackathons/teams/iag-team<N>
+iag-code --gpus 1 --workspace "$HOME/iag-team<N>"
 ```
 
 or:
@@ -193,7 +200,7 @@ or:
 iag-code --gpus 4 --time 08:00:00
 ```
 
-The editor opens in your team storage directory. Rootless Docker is started automatically.
+The editor opens in your team storage directory. Docker is checked on the compute node.
 
 If `code-server` is not already installed for your account, `iag-code` installs the standalone user version into:
 
@@ -246,40 +253,35 @@ Cancel a job:
 iag-cancel <jobid>
 ```
 
-## 10. Use Rootless Docker On Compute Nodes
+## 10. Use Docker On Compute Nodes
 
-Docker is available only on compute nodes, inside a Slurm allocation. The provided helper commands and sample scripts start it automatically.
+Docker is available only on compute nodes, inside a Slurm allocation. On Curiosity, the compute node already has access to a Docker daemon.
 
-If you write your own `sbatch` file, include this block near the top:
+If you write your own `sbatch` file, include this quick check near the top:
 
 ```bash
-module load rootless-docker
-if command -v start_rootless_docker >/dev/null 2>&1; then
-    start_rootless_docker
-else
-    start_rootless_docker.sh
-fi
-docker info
+docker info >/dev/null
+docker version
 ```
 
 ## 11. Copy Data
 
-From your laptop to the cluster:
+From your laptop to the cluster, copy into your team storage path. Replace the host and username with the Curiosity values shared by the support team:
 
 ```bash
-scp data.tar.gz <UNIQUE_AXIS_HASH>@ssh.axisapps.io:/lustre/fs01/hackathons/teams/iag-team<N>/
+scp data.tar.gz <UNIQUE_AXIS_HASH>@<CURIOSITY_LOGIN_HOST>:~/iag-team<N>/
 ```
 
 For larger folders, prefer `rsync`:
 
 ```bash
-rsync -avP ./dataset/ <UNIQUE_AXIS_HASH>@ssh.axisapps.io:/lustre/fs01/hackathons/teams/iag-team<N>/dataset/
+rsync -avP ./dataset/ <UNIQUE_AXIS_HASH>@<CURIOSITY_LOGIN_HOST>:~/iag-team<N>/dataset/
 ```
 
 From the cluster back to your laptop:
 
 ```bash
-rsync -avP <UNIQUE_AXIS_HASH>@ssh.axisapps.io:/lustre/fs01/hackathons/teams/iag-team<N>/outputs/ ./outputs/
+rsync -avP <UNIQUE_AXIS_HASH>@<CURIOSITY_LOGIN_HOST>:~/iag-team<N>/outputs/ ./outputs/
 ```
 
 ## 12. Minimal Slurm Cheat Sheet

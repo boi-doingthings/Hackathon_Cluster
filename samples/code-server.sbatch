@@ -10,7 +10,7 @@ set -euo pipefail
 umask 0007
 
 EXTERNAL_PORT="${EXTERNAL_PORT:-8080}"
-LOGIN_HOST="${IAG_LOGIN_HOST:-ssh.axisapps.io}"
+LOGIN_HOST="${IAG_LOGIN_HOST:-CURIOSITY_LOGIN_HOST_NOT_SET}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
 
 TEAM="${IAG_TEAM:-}"
@@ -19,12 +19,12 @@ if [[ -z "$TEAM" ]]; then
 fi
 
 if [[ -z "${TEAM_SCRATCH:-}" && -n "$TEAM" ]]; then
-    TEAM_SCRATCH="/lustre/fs01/hackathons/teams/${TEAM}"
+    TEAM_SCRATCH="${HOME}/${TEAM}"
 fi
 
 if [[ -z "${TEAM_SCRATCH:-}" || ! -d "$TEAM_SCRATCH" || ! -w "$TEAM_SCRATCH" ]]; then
     echo "Could not detect writable team storage." >&2
-    echo "Set TEAM_SCRATCH=/lustre/fs01/hackathons/teams/iag-team<N> before submitting." >&2
+    echo "Set TEAM_SCRATCH=\$HOME/iag-team<N> before submitting." >&2
     exit 1
 fi
 
@@ -68,12 +68,7 @@ echo
 nvidia-smi -L || true
 echo
 
-module load rootless-docker
-if command -v start_rootless_docker >/dev/null 2>&1; then
-    start_rootless_docker
-else
-    start_rootless_docker.sh
-fi
+docker info >/dev/null
 docker version
 echo
 
