@@ -148,12 +148,21 @@ def run_data_designer_tool_calling(
         )
     )
 
-    preview = sdk.data_designer.preview(builder, num_records=min(4, settings.num_records))
-    if preview.dataset.empty:
+    preview = sdk.data_designer.preview(
+        builder,
+        num_records=min(4, settings.num_records),
+        workspace=connection.workspace,
+    )
+    if preview.dataset is None or preview.dataset.empty:
         raise RuntimeError("Data Designer preview returned no records")
-    job = sdk.data_designer.create(builder, num_records=settings.num_records)
+    job = sdk.data_designer.create(
+        builder,
+        num_records=settings.num_records,
+        workspace=connection.workspace,
+    )
     job.wait_until_done()
-    dataset = job.download_artifacts().load_dataset()
+    artifact_directory = output_path.parent / "nemo_data_designer_artifacts"
+    dataset = job.download_artifacts(artifact_directory).load_dataset()
     records = [_to_openai_tool_record(row) for row in dataset.to_dict("records")]
     records = [record for record in records if len(record["messages"][1]["tool_calls"]) == 1]
     if not records:
@@ -174,12 +183,6 @@ def submit_embedding_customization(
     """Upload triplets and submit the official NeMo Customizer embedding SFT job."""
     try:
         from nemo_platform import ConflictError, NeMoPlatform
-        from nemo_platform.types.customization import (
-            CustomizationJobInputParam,
-            ParallelismParamsParam,
-            SftTrainingParam,
-        )
-        from nemo_platform.types.files import HuggingfaceStorageConfigParam
     except ImportError as exc:
         raise RuntimeError("Install NeMo Platform: uv sync --extra platform") from exc
 
@@ -192,6 +195,13 @@ def submit_embedding_customization(
         workspace=connection.workspace,
         access_token=connection.access_token,
     )
+    customization = getattr(sdk, "customization", None) or getattr(sdk, "customizer", None)
+    if customization is None:
+        raise RuntimeError(
+            "This NeMo Platform SDK build does not expose the Customizer resource. "
+            "Install the SDK/plugin version shipped with your Customizer deployment; "
+            "nemo-platform 0.2.0 from public PyPI currently omits it."
+        )
     try:
         sdk.files.filesets.create(
             workspace=connection.workspace,
@@ -212,12 +222,12 @@ def submit_embedding_customization(
             workspace=connection.workspace,
             name=settings.model_name,
             description="NVIDIA embedding base model for Humana grounding",
-            storage=HuggingfaceStorageConfigParam(
-                type="huggingface",
-                repo_id=settings.hf_repo_id,
-                repo_type="model",
-                token_secret=settings.hf_secret_name,
-            ),
+            storage={
+                "type": "huggingface",
+                "repo_id": settings.hf_repo_id,
+                "repo_type": "model",
+                "token_secret": settings.hf_secret_name,
+            },
         )
     except ConflictError:
         pass
@@ -245,27 +255,27 @@ def submit_embedding_customization(
         base_model = sdk.models.retrieve(workspace=connection.workspace, name=settings.model_name)
 
     job_name = f"humana-embed-finetune-{int(time.time())}"
-    job = sdk.customization.jobs.create(
+    job = customization.jobs.create(
         name=job_name,
         workspace=connection.workspace,
-        spec=CustomizationJobInputParam(
-            model=f"{connection.workspace}/{base_model.name}",
-            dataset=f"fileset://{connection.workspace}/{settings.dataset_name}",
-            training=SftTrainingParam(
-                type="sft",
-                epochs=settings.epochs,
-                batch_size=settings.batch_size,
-                learning_rate=settings.learning_rate,
-                max_seq_length=settings.max_seq_length,
-                micro_batch_size=1,
-                parallelism=ParallelismParamsParam(
-                    num_gpus_per_node=1,
-                    num_nodes=1,
-                    tensor_parallel_size=1,
-                    pipeline_parallel_size=1,
-                ),
-            ),
-        ),
+        spec={
+            "model": f"{connection.workspace}/{base_model.name}",
+            "dataset": f"fileset://{connection.workspace}/{settings.dataset_name}",
+            "training": {
+                "type": "sft",
+                "epochs": settings.epochs,
+                "batch_size": settings.batch_size,
+                "learning_rate": settings.learning_rate,
+                "max_seq_length": settings.max_seq_length,
+                "micro_batch_size": 1,
+                "parallelism": {
+                    "num_gpus_per_node": 1,
+                    "num_nodes": 1,
+                    "tensor_parallel_size": 1,
+                    "pipeline_parallel_size": 1,
+                },
+            },
+        },
     )
     return {"job_name": job.name, "output_model": job.spec.output.name}
 
@@ -311,4 +321,8 @@ def _to_openai_tool_record(row: dict[str, Any]) -> dict[str, Any]:
             {"role": "assistant", "content": "", "tool_calls": calls},
         ],
         "tools": tools,
+        "is_synthetic": True,
+        "disclaimer": (
+            "Synthetic training example; not a coverage decision, claim outcome, or medical advice."
+        ),
     }

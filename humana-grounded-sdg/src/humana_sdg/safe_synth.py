@@ -72,7 +72,11 @@ def run_safe_synthesis(
     """Run the official NeMo Platform Safe Synthesizer SDK workflow."""
     try:
         from nemo_platform import ConflictError, NeMoPlatform
-        from nemo_platform.beta.safe_synthesizer.job_builder import SafeSynthesizerJobBuilder
+
+        try:
+            from nemo_safe_synthesizer_plugin.sdk.job_builder import SafeSynthesizerJobBuilder
+        except ImportError:
+            from nemo_platform.beta.safe_synthesizer.job_builder import SafeSynthesizerJobBuilder
     except ImportError as exc:
         raise RuntimeError("Install NeMo Platform: uv sync --extra platform") from exc
 
@@ -95,7 +99,7 @@ def run_safe_synthesis(
         pass
 
     builder = (
-        SafeSynthesizerJobBuilder(client)
+        SafeSynthesizerJobBuilder(client, workspace=settings.workspace)
         .with_data_source(frame)
         .with_classify_model_provider(settings.provider_name)
         .with_replace_pii()

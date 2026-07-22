@@ -21,7 +21,11 @@ dependencies = [
 [project.optional-dependencies]
 curator = ["nemo-curator==1.2.0", "torch==2.6.0"]
 gpu = ["accelerate>=1.2,<2", "torch==2.6.0", "transformers>=5,<6"]
-platform = ["nemo-platform>=0.2,<0.3"]
+platform = [
+  "nemo-platform==0.2.0",
+  "nemo-safe-synthesizer==0.1.2",
+  "data-designer==0.8.0",
+]
 dev = ["pytest>=8.3,<9", "ruff>=0.9,<1"]
 
 [project.scripts]
@@ -34,6 +38,7 @@ packages = ["src/humana_sdg"]
 "src/humana_sdg/cli.py" = ["B008"]
 "src/humana_sdg/embedding.py" = ["S311"]
 "src/humana_sdg/nemo_platform_jobs.py" = ["S105"]
+"tests/test_platform_sdk_compat.py" = ["S106"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
