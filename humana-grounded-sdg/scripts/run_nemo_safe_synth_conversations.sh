@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 : "${NMP_WORKSPACE:?Set NMP_WORKSPACE to the authorized workspace}"
 : "${NMP_ACCESS_TOKEN:?Set NMP_ACCESS_TOKEN without writing it to disk}"
 
-CONVERSATIONS="${CONVERSATIONS:-outputs/run/synthetic/customer_support_transcripts.jsonl}"
+CONVERSATIONS="${CONVERSATIONS:-outputs/run/synthetic/support_conversations.jsonl}"
 OUTPUT="${SAFE_SYNTH_OUTPUT:-outputs/safe_synth_conversations}"
 if [[ ! -f "$CONVERSATIONS" ]]; then
   printf 'Conversation dataset not found: %s\n' "$CONVERSATIONS" >&2

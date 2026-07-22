@@ -412,28 +412,7 @@ scripts/run_nemo_evaluator_skills.sh BFCL v4 Evaluator entrypoint
 
 ## Customer-support SLM transcript dataset
 
-The production pipeline now generates a deterministic, citation-preserving multi-turn dataset for Humana
-customer-support SLM development. The default full run writes 1,200 conversations (7,200 alternating turns)
-to `synthetic/customer_support_transcripts.jsonl` and fails closed below the configured quantity, use-case,
-grounding, privacy, or structural thresholds.
-
-Each record contains a synthetic case reference, coarse non-identifying profile, six alternating customer and
-assistant turns, a public Humana/CMS citation, a synthetic-only marker, a required-human-verification marker,
-and a disclaimer. It never represents a real member, coverage decision, claim outcome, eligibility result,
-authorization result, or medical recommendation.
-
-The full public corpus currently supports ten balanced use cases:
-
-- benefits and eligibility guidance
-- claims and billing
-- community and corporate impact
-- compliance, fraud, waste, and abuse
-- appeals and grievances
-- Medicaid provider support
-- Medicare basics
-- pharmacy and Part D
-- privacy and data rights
-- provider and network support
+The production pipeline generates 1,200 deterministic, citation-preserving conversations (9,600 alternating turns) in `synthetic/support_conversations.jsonl`, plus `synthetic/support_sft_openai.jsonl` for SLM fine-tuning. The 12 balanced use cases are appeals/grievances, care management, claims/billing, compliance reporting, dental benefits, eligibility/enrollment, Medicaid member support, pharmacy benefits, plan benefits, prior authorization, privacy preferences, and provider directory.
 
 Run the full NeMo Curator pipeline and transcript gates:
 
@@ -441,37 +420,31 @@ Run the full NeMo Curator pipeline and transcript gates:
 uv run humana-sdg all \
   --engine nemo \
   --records-per-chunk 2 \
-  --conversation-records 1200 \
+  --support-conversations 1200 \
+  --support-seed 20260722 \
   --workspace outputs/customer-support-full
 ```
 
 Evaluate an existing transcript file:
 
 ```bash
-uv run humana-sdg evaluate-conversations \
-  --conversations outputs/customer-support-full/synthetic/customer_support_transcripts.jsonl \
+uv run humana-sdg evaluate-support \
+  --conversations outputs/customer-support-full/synthetic/support_conversations.jsonl \
   --curated outputs/customer-support-full/curated/chunks.jsonl \
-  --output outputs/customer-support-full/conversation_evaluation.json \
-  --min-conversations 1000 \
-  --min-use-cases 8
+  --output outputs/customer-support-full/support_evaluation.json
 ```
 
 ### Authentic Safe Synthesizer SQS and DPS
 
-`synthetic_data_quality_score` (SQS) and `data_privacy_score` (DPS) are service-produced Safe Synthesizer
-metrics. This repository records those fields only from the official Safe Synthesizer job summary; it does not
-fabricate or relabel local heuristic scores. Configure an actual NeMo Platform deployment, then run:
+`synthetic_data_quality_score` (SQS) and `data_privacy_score` (DPS) are service-produced Safe Synthesizer metrics. This repository records those fields only from the official Safe Synthesizer job summary; it does not fabricate or relabel local heuristic scores. Configure an actual NeMo Platform deployment, then run:
 
 ```bash
 export NMP_BASE_URL='https://<your-nemo-platform>'
 export NMP_WORKSPACE='<workspace>'
 export NMP_ACCESS_TOKEN='<runtime-secret>'
 export NMP_MODEL_PROVIDER='<configured-provider>'
-CONVERSATIONS=outputs/customer-support-full/synthetic/customer_support_transcripts.jsonl \
+CONVERSATIONS=outputs/customer-support-full/synthetic/support_conversations.jsonl \
   bash scripts/run_nemo_safe_synth_conversations.sh
 ```
 
-The adapter writes the generated dataset, evaluation report, raw report bundle, and `safe_synth_summary.json`
-containing authentic SQS/DPS values. NeMo Evaluator is a separate model-evaluation service: use it after a
-customer-support SLM endpoint has been trained and deployed. Dataset gates in `conversation_evaluation.json`
-are project quality evidence and are never presented as NeMo Evaluator service output.
+The adapter writes the generated dataset, evaluation report, raw report bundle, and `safe_synth_summary.json` containing authentic SQS/DPS values. NeMo Evaluator is a separate model-evaluation service: use it after a customer-support SLM endpoint has been trained and deployed. Dataset gates in `support_evaluation.json` are project quality evidence and are never presented as NeMo Evaluator service output.
