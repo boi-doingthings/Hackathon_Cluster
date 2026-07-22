@@ -21,13 +21,11 @@ fi
 
 TEAM_SCRATCH="${TEAM_SCRATCH:-${HOME}/${TEAM}}"
 PROJECT_DIR="${PROJECT_DIR:-${TEAM_SCRATCH}/example-python-job}"
-RUNTIME_DIR="${TEAM_SCRATCH}/.iag/${USER:-user}"
+RUNTIME_DIR="${TEAM_SCRATCH}/.${USER:-user}"
 VENV_DIR="${VENV_DIR:-${RUNTIME_DIR}/venvs/example-python}"
 
 mkdir -p "$RUNTIME_DIR/venvs" "$RUNTIME_DIR/cache/uv" "$RUNTIME_DIR/cache/pip"
-chgrp "$TEAM" "${TEAM_SCRATCH}/.iag" "$RUNTIME_DIR" 2>/dev/null || true
-chmod -R g+rwX "${TEAM_SCRATCH}/.iag" 2>/dev/null || true
-chmod 2770 "${TEAM_SCRATCH}/.iag" "$RUNTIME_DIR" 2>/dev/null || true
+chmod 700 "$RUNTIME_DIR" 2>/dev/null || true
 export UV_CACHE_DIR="${RUNTIME_DIR}/cache/uv"
 export PIP_CACHE_DIR="${RUNTIME_DIR}/cache/pip"
 

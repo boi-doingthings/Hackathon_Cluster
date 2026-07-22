@@ -65,7 +65,7 @@ Put datasets, checkpoints, notebooks, and cloned repos under this directory.
 The helper scripts start in this team directory by default so teammates can collaborate in the same fast-storage workspace. Per-user runtime files such as virtual environments, logs, and tunnel commands are stored under:
 
 ```bash
-$TEAM_SCRATCH/.iag/$USER/
+$TEAM_SCRATCH/.$USER/
 ```
 
 This avoids conflicts between the five user accounts on the same team.
@@ -154,7 +154,7 @@ iag-jupyter --gpus 4 --time 08:00:00
 
 The command prints the Slurm job id and tells you where the log file will appear. Once the job starts, the log shows the SSH tunnel command and the local browser URL.
 
-`iag-jupyter` starts in your team storage directory. It creates a per-user virtual environment under `$TEAM_SCRATCH/.iag/$USER/venvs/iag-jupyter` and installs JupyterLab inside it.
+`iag-jupyter` starts in your team storage directory. It creates a per-user virtual environment under `$TEAM_SCRATCH/.$USER/venvs/iag-jupyter` and installs JupyterLab inside it.
 
 The first launch can take a few minutes while the virtual environment is created. Later launches reuse the same environment.
 
@@ -175,7 +175,7 @@ iag-jupyter --gpus 1
 After the job starts, you can also see the tunnel command with:
 
 ```bash
-cat "$TEAM_SCRATCH/.iag/$USER/port_forwarding_command.jupyter"
+cat "$TEAM_SCRATCH/.$USER/port_forwarding_command.jupyter"
 ```
 
 ## 8. Start VS Code In The Browser Beta
@@ -219,7 +219,7 @@ It installs the recommended Python and Jupyter extensions on first use.
 After the job starts, see the tunnel command with:
 
 ```bash
-cat "$TEAM_SCRATCH/.iag/$USER/port_forwarding_command.code"
+cat "$TEAM_SCRATCH/.$USER/port_forwarding_command.code"
 ```
 
 If the user-level install fails, use JupyterLab and share the `code-*.out` log with the support team.

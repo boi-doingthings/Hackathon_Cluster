@@ -30,17 +30,13 @@ fi
 
 cd "$TEAM_SCRATCH"
 
-RUNTIME_DIR="${PWD}/.iag/${USER:-user}"
+RUNTIME_DIR="${PWD}/.${USER:-user}"
 mkdir -p \
     "${RUNTIME_DIR}/code-server/config" \
     "${RUNTIME_DIR}/code-server/data" \
     "${RUNTIME_DIR}/code-server/extensions" \
     "${RUNTIME_DIR}/cache"
-if [[ -n "$TEAM" ]]; then
-    chgrp "$TEAM" "${PWD}/.iag" "${RUNTIME_DIR}" 2>/dev/null || true
-fi
-chmod -R g+rwX "${PWD}/.iag" 2>/dev/null || true
-chmod 2770 "${PWD}/.iag" "${RUNTIME_DIR}" 2>/dev/null || true
+chmod 700 "${RUNTIME_DIR}" 2>/dev/null || true
 
 export XDG_CONFIG_HOME="${RUNTIME_DIR}/code-server/config"
 export XDG_DATA_HOME="${RUNTIME_DIR}/code-server/data"

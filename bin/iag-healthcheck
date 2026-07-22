@@ -80,13 +80,10 @@ if [[ -n "${TEAM_SCRATCH:-}" ]]; then
     test -w "${TEAM_SCRATCH}"
     cd "${TEAM_SCRATCH}"
     echo "Writable team storage: yes"
-    mkdir -p ".iag/${USER:-user}/logs" ".iag/${USER:-user}/venvs"
-    TEAM_GROUP="$(id -Gn | tr ' ' '\n' | grep -E '^iag-team[0-9]+$' | head -n 1 || true)"
-    if [[ -n "$TEAM_GROUP" ]]; then
-        chgrp "$TEAM_GROUP" ".iag" ".iag/${USER:-user}" ".iag/${USER:-user}/logs" ".iag/${USER:-user}/venvs" 2>/dev/null || true
-    fi
-    chmod 2770 ".iag" ".iag/${USER:-user}" ".iag/${USER:-user}/logs" ".iag/${USER:-user}/venvs" 2>/dev/null || true
-    echo "Per-user runtime directory: ${TEAM_SCRATCH}/.iag/${USER:-user}"
+    RUNTIME_DIR="${TEAM_SCRATCH}/.${USER:-user}"
+    mkdir -p "${RUNTIME_DIR}/logs" "${RUNTIME_DIR}/venvs"
+    chmod 700 "${RUNTIME_DIR}" 2>/dev/null || true
+    echo "Per-user scratch directory: ${RUNTIME_DIR}"
 else
     echo "TEAM_SCRATCH is not set"
 fi

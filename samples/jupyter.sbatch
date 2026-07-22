@@ -31,7 +31,7 @@ fi
 
 cd "$TEAM_SCRATCH"
 
-RUNTIME_DIR="${PWD}/.iag/${USER:-user}"
+RUNTIME_DIR="${PWD}/.${USER:-user}"
 mkdir -p \
     "${RUNTIME_DIR}/venvs" \
     "${RUNTIME_DIR}/jupyter/config" \
@@ -40,11 +40,7 @@ mkdir -p \
     "${RUNTIME_DIR}/ipython" \
     "${RUNTIME_DIR}/cache/uv" \
     "${RUNTIME_DIR}/cache/pip"
-if [[ -n "$TEAM" ]]; then
-    chgrp "$TEAM" "${PWD}/.iag" "${RUNTIME_DIR}" 2>/dev/null || true
-fi
-chmod -R g+rwX "${PWD}/.iag" 2>/dev/null || true
-chmod 2770 "${PWD}/.iag" "${RUNTIME_DIR}" 2>/dev/null || true
+chmod 700 "${RUNTIME_DIR}" 2>/dev/null || true
 
 export JUPYTER_CONFIG_DIR="${RUNTIME_DIR}/jupyter/config"
 export JUPYTER_DATA_DIR="${RUNTIME_DIR}/jupyter/data"

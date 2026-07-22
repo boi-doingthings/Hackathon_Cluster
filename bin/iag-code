@@ -77,7 +77,7 @@ umask 0007
 
 EXTERNAL_PORT="${IAG_CODE_EXTERNAL_PORT:-8080}"
 LOGIN_HOST="${IAG_LOGIN_HOST:-CURIOSITY_LOGIN_HOST_NOT_SET}"
-RUNTIME_DIR="${IAG_RUNTIME_DIR:-${PWD}/.iag/${USER:-user}}"
+RUNTIME_DIR="${IAG_RUNTIME_DIR:-${PWD}/.${USER:-user}}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
 mkdir -p \
     "${RUNTIME_DIR}/code-server/config" \

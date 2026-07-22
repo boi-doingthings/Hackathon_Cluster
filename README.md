@@ -72,7 +72,7 @@ Shared project files should live directly under `$TEAM_SCRATCH`.
 Per-user runtime files live under:
 
 ```bash
-$TEAM_SCRATCH/.iag/$USER/
+$TEAM_SCRATCH/.$USER/
 ```
 
 This keeps five teammates on the same team from colliding over virtual environments, logs, and tunnel command files.

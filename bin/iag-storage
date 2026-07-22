@@ -27,7 +27,7 @@ if [[ -n "$workspace" ]]; then
     echo "Resolved team workspace: $workspace"
     runtime_dir="$(iag_runtime_dir "$workspace")"
     mkdir -p "$runtime_dir/logs" "$runtime_dir/venvs"
-    echo "Per-user runtime dir: $runtime_dir"
+    echo "Per-user scratch dir: $runtime_dir"
 else
     iag_workspace_diagnostics
     exit 1
