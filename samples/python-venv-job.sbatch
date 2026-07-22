@@ -36,6 +36,10 @@ echo
 mkdir -p "$PROJECT_DIR"
 cd "$PROJECT_DIR"
 
+if ! command -v uv >/dev/null 2>&1 && command -v module >/dev/null 2>&1; then
+    module load "${IAG_UV_MODULE:-py-uv/0.6.8}" >/dev/null 2>&1 || module load uv >/dev/null 2>&1 || true
+fi
+
 if [[ ! -d "$VENV_DIR" ]]; then
     if command -v uv >/dev/null 2>&1; then
         uv venv "$VENV_DIR"
@@ -46,10 +50,10 @@ fi
 
 source "$VENV_DIR/bin/activate"
 if command -v uv >/dev/null 2>&1; then
-    uv pip install --upgrade pip
+    echo "Using $(uv --version)"
 else
+    echo "Using $(python --version) with pip"
     python -m ensurepip --upgrade >/dev/null 2>&1 || true
-    python -m pip install --upgrade pip
 fi
 
 # Replace this with your project requirements.

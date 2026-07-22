@@ -95,6 +95,10 @@ docker version
 echo
 
 echo "Python virtualenv tooling:"
+UV_MODULE="${IAG_UV_MODULE:-py-uv/0.6.8}"
+if ! command -v uv >/dev/null 2>&1 && command -v module >/dev/null 2>&1; then
+    module load "${UV_MODULE}" >/dev/null 2>&1 || module load uv >/dev/null 2>&1 || true
+fi
 if command -v uv >/dev/null 2>&1; then
     uv --version
 else

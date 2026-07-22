@@ -109,6 +109,7 @@ iag-submit samples/gpu-smoke-test.sbatch
 - The default partition is `primary`.
 - Memory is not requested by default. Pass `--mem` only if a job needs a specific amount.
 - Docker is available through the compute-node Docker daemon. No `rootless-docker` module is used on Curiosity.
+- The default Curiosity uv module is `py-uv/0.6.8`. Override with `IAG_UV_MODULE` if the module name changes.
 - JupyterLab is installed into a per-user virtual environment on team storage.
 - `iag-code` is beta. If `code-server` is missing, it installs the standalone user version into `~/.local`.
 - If local port `8001` or `8080` is already in use, pass `--port` to `iag-jupyter` or `iag-code`.

@@ -12,6 +12,7 @@ umask 0007
 EXTERNAL_PORT="${EXTERNAL_PORT:-8001}"
 LOGIN_HOST="${IAG_LOGIN_HOST:-CURIOSITY_LOGIN_HOST_NOT_SET}"
 VENV_NAME="${IAG_JUPYTER_VENV_NAME:-iag-jupyter}"
+UV_MODULE="${IAG_UV_MODULE:-py-uv/0.6.8}"
 NODE="$(hostname -f 2>/dev/null || hostname)"
 
 TEAM="${IAG_TEAM:-}"
@@ -74,7 +75,7 @@ docker version
 echo
 
 if ! command -v uv >/dev/null 2>&1 && command -v module >/dev/null 2>&1; then
-    module load uv >/dev/null 2>&1 || true
+    module load "${UV_MODULE}" >/dev/null 2>&1 || module load uv >/dev/null 2>&1 || true
 fi
 VENV_DIR="${RUNTIME_DIR}/venvs/${VENV_NAME}"
 if [[ ! -d "$VENV_DIR" ]]; then
@@ -87,11 +88,11 @@ fi
 source "${VENV_DIR}/bin/activate"
 if ! command -v jupyter >/dev/null 2>&1; then
     if command -v uv >/dev/null 2>&1; then
-        uv pip install --upgrade pip
+        echo "Using $(uv --version)"
         uv pip install jupyterlab
     else
+        echo "Using $(python --version) with pip"
         python -m ensurepip --upgrade >/dev/null 2>&1 || true
-        python -m pip install --upgrade pip
         python -m pip install jupyterlab
     fi
 fi
