@@ -6,11 +6,6 @@ from pathlib import Path
 
 import typer
 
-from humana_sdg.conversations import (
-    ConversationEvaluationThresholds,
-    conversations_to_safe_synth_frame,
-    read_conversations_jsonl,
-)
 from humana_sdg.curate import CuratorSettings
 from humana_sdg.nemo_platform_jobs import (
     DataDesignerSettings,
@@ -19,12 +14,18 @@ from humana_sdg.nemo_platform_jobs import (
     run_data_designer_tool_calling,
     submit_embedding_customization,
 )
-from humana_sdg.safe_synth import SafeSynthSettings, records_to_safe_synth_frame, run_safe_synthesis
+from humana_sdg.safe_synth import (
+    SafeSynthSettings,
+    conversations_to_safe_synth_frame,
+    records_to_safe_synth_frame,
+    run_safe_synthesis,
+)
+from humana_sdg.support import read_support_conversations_jsonl
 from humana_sdg.workflow import (
     curate_extracted_chunks,
     download_manifest_sources,
-    evaluate_conversation_dataset,
     evaluate_dataset,
+    evaluate_support_dataset,
     extract_downloaded_pdfs,
     generate_all_datasets,
     read_records_jsonl,
@@ -86,14 +87,18 @@ def generate(
     output: Path = typer.Option(Path("data/synthetic")),
     records_per_chunk: int = typer.Option(2, min=1, max=3),
     tool_records: int = typer.Option(200, min=1),
-    conversation_records: int = typer.Option(1200, min=1000),
+    support_conversations: int = typer.Option(
+        1200, "--support-conversations", "--conversation-records", min=1000
+    ),
+    support_seed: int = typer.Option(20260722, "--support-seed"),
 ) -> None:
     paths = generate_all_datasets(
         curated,
         output,
         records_per_chunk=records_per_chunk,
         tool_records=tool_records,
-        conversation_records=conversation_records,
+        support_conversations=support_conversations,
+        support_seed=support_seed,
     )
     typer.echo(json.dumps({key: str(value) for key, value in paths.items()}, indent=2))
 
@@ -110,25 +115,15 @@ def evaluate(
         raise typer.Exit(code=2)
 
 
-@app.command("evaluate-conversations")
-def evaluate_customer_support_conversations(
+@app.command("evaluate-support")
+def evaluate_support(
     conversations: Path = typer.Option(
-        Path("data/synthetic/customer_support_transcripts.jsonl"), exists=True
+        Path("data/synthetic/support_conversations.jsonl"), exists=True
     ),
     curated: Path = typer.Option(Path("data/curated/chunks.jsonl"), exists=True),
-    output: Path = typer.Option(Path("outputs/conversation_evaluation.json")),
-    min_conversations: int = typer.Option(1000, min=1),
-    min_use_cases: int = typer.Option(8, min=1),
+    output: Path = typer.Option(Path("outputs/support_evaluation.json")),
 ) -> None:
-    report = evaluate_conversation_dataset(
-        conversations,
-        curated,
-        output,
-        thresholds=ConversationEvaluationThresholds(
-            min_conversations=min_conversations,
-            min_use_cases=min_use_cases,
-        ),
-    )
+    report = evaluate_support_dataset(conversations, curated, output)
     typer.echo(report.model_dump_json(indent=2))
     if not report.passed:
         raise typer.Exit(code=2)
@@ -189,7 +184,8 @@ def safe_synthesize(
 @app.command("safe-synthesize-conversations")
 def safe_synthesize_conversations(
     conversations: Path = typer.Option(
-        Path("data/synthetic/customer_support_transcripts.jsonl"), exists=True
+        Path("data/synthetic/support_conversations.jsonl"),
+        exists=True,
     ),
     output: Path = typer.Option(Path("outputs/safe_synth_conversations")),
     allow_no_holdout: bool = typer.Option(False),
@@ -202,7 +198,7 @@ def safe_synthesize_conversations(
         hf_secret_name=os.environ.get("NMP_HF_SECRET_NAME"),
         allow_no_holdout=allow_no_holdout,
     )
-    frame = conversations_to_safe_synth_frame(read_conversations_jsonl(conversations))
+    frame = conversations_to_safe_synth_frame(read_support_conversations_jsonl(conversations))
     typer.echo(run_safe_synthesis(frame, output, settings).model_dump_json(indent=2))
 
 
@@ -213,8 +209,10 @@ def run_all(
     engine: str = typer.Option("nemo"),
     limit: int | None = typer.Option(None, min=1),
     records_per_chunk: int = typer.Option(2, min=1, max=3),
-    conversation_records: int = typer.Option(1200, min=1000),
-    min_conversation_use_cases: int = typer.Option(8, min=1),
+    support_conversations: int = typer.Option(
+        1200, "--support-conversations", "--conversation-records", min=1000
+    ),
+    support_seed: int = typer.Option(20260722, "--support-seed"),
 ) -> None:
     raw = workspace / "raw"
     interim = workspace / "interim" / "extracted_chunks.jsonl"
@@ -232,28 +230,27 @@ def run_all(
         curated,
         synthetic,
         records_per_chunk=records_per_chunk,
-        conversation_records=conversation_records,
+        support_conversations=support_conversations,
+        support_seed=support_seed,
     )
     report = evaluate_dataset(paths["grounded_records"], curated, workspace / "evaluation.json")
-    conversation_report = evaluate_conversation_dataset(
-        paths["customer_support_transcripts"],
+    conversation_report = evaluate_support_dataset(
+        paths["support_conversations"],
         curated,
         workspace / "conversation_evaluation.json",
-        thresholds=ConversationEvaluationThresholds(
-            min_conversations=conversation_records,
-            min_use_cases=min_conversation_use_cases,
-        ),
     )
     typer.echo(
         json.dumps(
             {
                 "workspace": str(workspace),
                 "records": str(paths["grounded_records"]),
+                "support_conversations": str(paths["support_conversations"]),
+                "support_openai_sft": str(paths["support_openai_sft"]),
                 "evaluation_passed": report.passed,
                 "record_count": report.record_count,
                 "conversation_evaluation_passed": conversation_report.passed,
                 "conversation_count": conversation_report.conversation_count,
-                "conversation_use_case_counts": conversation_report.use_case_counts,
+                "conversation_use_cases": conversation_report.use_case_counts,
             },
             indent=2,
         )

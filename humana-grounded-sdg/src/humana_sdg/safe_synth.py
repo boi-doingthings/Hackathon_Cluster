@@ -9,6 +9,7 @@ import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field
 
 from humana_sdg.models import SyntheticRecord
+from humana_sdg.support import SupportConversation
 
 SAFE_SYNTH_COLUMNS = [
     "record_id",
@@ -18,6 +19,21 @@ SAFE_SYNTH_COLUMNS = [
     "citation_source_ids",
     "citation_pages",
     "is_synthetic",
+    "disclaimer",
+]
+
+SUPPORT_SAFE_SYNTH_COLUMNS = [
+    "conversation_id",
+    "use_case",
+    "channel",
+    "customer_persona",
+    "customer_sentiment",
+    "outcome",
+    "transcript",
+    "citation_source_ids",
+    "citation_pages",
+    "is_synthetic",
+    "requires_human_verification",
     "disclaimer",
 ]
 
@@ -44,6 +60,10 @@ class SafeSynthResult(BaseModel):
     summary_json: Path
     synthetic_quality_score: float | None
     data_privacy_score: float | None
+    sqs: float | None = None
+    dps: float | None = None
+    official_scores_available: bool = False
+    score_source: str = "nemo-safe-synthesizer"
 
 
 def records_to_safe_synth_frame(records: Iterable[SyntheticRecord]) -> pd.DataFrame:
@@ -62,6 +82,84 @@ def records_to_safe_synth_frame(records: Iterable[SyntheticRecord]) -> pd.DataFr
             }
         )
     return pd.DataFrame(rows, columns=SAFE_SYNTH_COLUMNS)
+
+
+def conversations_to_safe_synth_frame(
+    conversations: Iterable[SupportConversation],
+) -> pd.DataFrame:
+    rows = []
+    for conversation in conversations:
+        transcript = "\n".join(
+            f"{turn.role.upper()}: {turn.content}" for turn in conversation.turns
+        )
+        rows.append(
+            {
+                "conversation_id": conversation.conversation_id,
+                "use_case": conversation.use_case,
+                "channel": conversation.channel,
+                "customer_persona": conversation.customer_persona,
+                "customer_sentiment": conversation.customer_sentiment,
+                "outcome": conversation.outcome,
+                "transcript": transcript,
+                "citation_source_ids": "|".join(
+                    citation.source_id for citation in conversation.citations
+                ),
+                "citation_pages": "|".join(
+                    str(citation.page) for citation in conversation.citations
+                ),
+                "is_synthetic": conversation.is_synthetic,
+                "requires_human_verification": conversation.requires_human_verification,
+                "disclaimer": conversation.disclaimer,
+            }
+        )
+    return pd.DataFrame(rows, columns=SUPPORT_SAFE_SYNTH_COLUMNS)
+
+
+def build_safe_synth_score_payload(summary: object, *, require_scores: bool) -> dict[str, object]:
+    if hasattr(summary, "model_dump"):
+        raw_summary = summary.model_dump(mode="json")
+    elif isinstance(summary, dict):
+        raw_summary = dict(summary)
+    else:
+        raw_summary = {
+            name: getattr(summary, name, None)
+            for name in (
+                "synthetic_data_quality_score",
+                "data_privacy_score",
+                "num_valid_records",
+                "num_invalid_records",
+                "num_prompts",
+                "valid_record_fraction",
+            )
+        }
+    sqs = raw_summary.get(
+        "synthetic_data_quality_score",
+        getattr(summary, "synthetic_data_quality_score", None),
+    )
+    dps = raw_summary.get(
+        "data_privacy_score",
+        getattr(summary, "data_privacy_score", None),
+    )
+    available = sqs is not None and dps is not None
+    payload: dict[str, object] = {
+        "score_source": "nemo-safe-synthesizer",
+        "official_scores_available": available,
+        "sqs": sqs,
+        "dps": dps,
+        "synthetic_data_quality_score": sqs,
+        "data_privacy_score": dps,
+        "sqs_scale": "0-10",
+        "dps_scale": "raw NeMo Safe Synthesizer score",
+        "num_valid_records": raw_summary.get("num_valid_records"),
+        "num_prompts": raw_summary.get("num_prompts"),
+        "raw_summary": raw_summary,
+    }
+    if require_scores and not available:
+        raise RuntimeError(
+            "NeMo Safe Synthesizer completed but did not return required SQS/DPS; "
+            "do not treat this run as production-evaluated."
+        )
+    return payload
 
 
 def run_safe_synthesis(
@@ -121,14 +219,15 @@ def run_safe_synthesis(
     summary_json = output_directory / "safe_synth_summary.json"
     synthetic_frame.to_csv(synthetic_csv, index=False)
     job.save_report(str(evaluation_report))
-    payload = {
-        "job_name": job.job_name,
-        "synthetic_data_quality_score": getattr(summary, "synthetic_data_quality_score", None),
-        "data_privacy_score": getattr(summary, "data_privacy_score", None),
-        "num_valid_records": getattr(summary, "num_valid_records", None),
-        "num_prompts": getattr(summary, "num_prompts", None),
-    }
+    require_scores = len(frame) >= settings.minimum_rows_for_evaluation
+    payload = build_safe_synth_score_payload(summary, require_scores=False)
+    payload["job_name"] = job.job_name
     summary_json.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    if require_scores and not payload["official_scores_available"]:
+        raise RuntimeError(
+            "NeMo Safe Synthesizer completed but did not return required SQS/DPS; "
+            f"inspect {summary_json}."
+        )
     return SafeSynthResult(
         job_name=job.job_name,
         synthetic_csv=synthetic_csv,
@@ -136,4 +235,8 @@ def run_safe_synthesis(
         summary_json=summary_json,
         synthetic_quality_score=payload["synthetic_data_quality_score"],
         data_privacy_score=payload["data_privacy_score"],
+        sqs=payload["sqs"],
+        dps=payload["dps"],
+        official_scores_available=bool(payload["official_scores_available"]),
+        score_source=str(payload["score_source"]),
     )

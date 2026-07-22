@@ -42,7 +42,13 @@ print("gpu_matmul", tuple(y.shape), y.device)
 PY
 uv run python -m pytest -q
 uv run ruff check src tests
-args=(--engine nemo --records-per-chunk 2 --conversation-records "${CONVERSATION_RECORDS:-1200}" --workspace "$OUTPUT_DIR")
+args=(
+  --engine nemo
+  --records-per-chunk 2
+  --support-conversations "${SUPPORT_CONVERSATIONS:-1200}"
+  --support-seed "${SUPPORT_SEED:-20260722}"
+  --workspace "$OUTPUT_DIR"
+)
 if [[ -n "${SOURCE_LIMIT:-}" ]]; then args+=(--limit "$SOURCE_LIMIT"); fi
 uv run humana-sdg all "${args[@]}"
 uv run python - "$OUTPUT_DIR" <<'PY'

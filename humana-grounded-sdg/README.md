@@ -12,11 +12,12 @@ This repository does **not** contain member records, PHI, copied PDFs, credentia
 4. Run NeMo Curator `JsonlReader -> AddId -> WordCountFilter -> JsonlWriter` as the first production curation stage.
 5. Apply deterministic exact-text deduplication without losing page citations.
 6. Generate page-grounded synthetic QA/explanation examples with `chunk_id` citations.
-7. Generate OpenAI-format, single-call insurance tool-use examples using `SYN-*` identifiers only.
-8. Generate `query` / `pos_doc` / `neg_doc` triplets for NeMo embedding customization.
-9. Gate output on citation validity, quote grounding, answer support, duplicates and sensitive PII patterns.
-10. Optionally run NeMo Safe Synthesizer, Data Designer, Customizer and NeMo Evaluator Skills.
-11. Run in a Slurm GPU allocation with a verified CUDA matrix multiplication and auditable SHA-256 manifest.
+7. Generate 1,200 deterministic, multi-turn customer-support transcripts across 12 use cases, plus OpenAI SFT JSONL.
+8. Generate OpenAI-format, single-call insurance tool-use examples using `SYN-*` identifiers only.
+9. Generate `query` / `pos_doc` / `neg_doc` triplets for NeMo embedding customization.
+10. Gate output on citation validity, quote grounding, answer support, duplicates and sensitive PII patterns.
+11. Optionally run NeMo Safe Synthesizer, Data Designer, Customizer and NeMo Evaluator Skills.
+12. Run in a Slurm GPU allocation with a verified CUDA matrix multiplication and auditable SHA-256 manifest.
 
 ## Safety and lawful-use boundary
 
@@ -46,6 +47,9 @@ JsonlReader -> AddId -> WordCountFilter -> JsonlWriter
 exact dedup + governed chunks
         |
         +--> grounded_synthetic.jsonl --> custom grounding/privacy evaluation
+        |
+        +--> support_conversations.jsonl --> support SLM training + local quality gates
+        |                                --> support_sft_openai.jsonl
         |
         +--> tool_calling_openai.jsonl --> Data Designer / Customizer / BFCL v4
         |
@@ -157,8 +161,10 @@ humana-sdg extract
 humana-sdg curate                 # default engine: nemo
 humana-sdg generate
 humana-sdg evaluate
+humana-sdg evaluate-support
 humana-sdg all
 humana-sdg safe-synthesize
+humana-sdg safe-synthesize-conversations
 humana-sdg data-designer-tools
 humana-sdg customize-embeddings
 ```
@@ -212,6 +218,12 @@ Every record contains an exact `chunk_id`, URL, page and quoted support:
 }
 ```
 
+### Customer-support conversation
+
+`support_conversations.jsonl` contains 1,200 deterministic eight-turn conversations across 12 Humana support use cases. Every item carries a synthetic-only case reference, channel, persona, outcome, exact page citation, public-source quote, explicit no-determination disclaimer and human-verification requirement. `support_sft_openai.jsonl` exports the same conversations as alternating `user` / `assistant` messages for SLM fine-tuning.
+
+The fail-closed `humana-sdg evaluate-support` command requires 100% citation validity, grounded quotes, valid turn structure and safety compliance; zero personal-PII findings; at least 10 use cases; and no more than 2% exact duplicates.
+
 ### Tool-calling record
 
 `tool_calling_openai.jsonl` follows the OpenAI `messages` + `tools` format used by the NVIDIA tool-calling tutorial. It allows one call per example and uses only `SYN-*` references.
@@ -258,9 +270,9 @@ export NMP_MODEL_PROVIDER=system/nvidia-build
 export NMP_ACCESS_TOKEN=...
 export NMP_HF_SECRET_NAME=hf-token
 
-uv run humana-sdg safe-synthesize \
-  --records data/synthetic/grounded_synthetic.jsonl \
-  --output outputs/safe_synth
+uv run humana-sdg safe-synthesize-conversations \
+  --conversations data/synthetic/support_conversations.jsonl \
+  --output outputs/safe_synth_conversations
 ```
 
 The adapter follows the official builder sequence:
@@ -387,6 +399,7 @@ src/humana_sdg/download.py           fail-closed PDF downloader
 src/humana_sdg/extract.py            page extraction and chunking
 src/humana_sdg/curate.py             NeMo Curator adapter + exact dedup
 src/humana_sdg/generate.py           grounded deterministic generator
+src/humana_sdg/support.py            multi-turn support transcripts + quality gates
 src/humana_sdg/tool_data.py          governed OpenAI tool-call records
 src/humana_sdg/embedding.py          Customizer triplet preparation
 src/humana_sdg/evaluate.py           grounding/privacy gates

@@ -3,14 +3,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from humana_sdg.conversations import (
-    ConversationEvaluationReport,
-    ConversationEvaluationThresholds,
-    evaluate_conversations,
-    generate_support_conversations,
-    read_conversations_jsonl,
-    write_conversations_jsonl,
-)
 from humana_sdg.curate import (
     CuratorSettings,
     curate_chunks_python,
@@ -25,6 +17,14 @@ from humana_sdg.extract import extract_pdf
 from humana_sdg.generate import generate_deterministic_records, write_records_jsonl
 from humana_sdg.manifest import load_manifest
 from humana_sdg.models import SyntheticRecord
+from humana_sdg.support import (
+    SupportEvaluationReport,
+    SupportEvaluationThresholds,
+    evaluate_support_conversations,
+    generate_support_conversations,
+    read_support_conversations_jsonl,
+    write_support_datasets,
+)
 from humana_sdg.tool_data import generate_tool_call_records, write_tool_call_jsonl
 
 
@@ -109,7 +109,8 @@ def generate_all_datasets(
     *,
     records_per_chunk: int = 2,
     tool_records: int = 200,
-    conversation_records: int = 1200,
+    support_conversations: int = 1200,
+    support_seed: int = 20260722,
 ) -> dict[str, Path]:
     chunks = read_chunks_jsonl(curated_jsonl)
     output_directory.mkdir(parents=True, exist_ok=True)
@@ -118,23 +119,42 @@ def generate_all_datasets(
     records = generate_deterministic_records(chunks, records_per_chunk=records_per_chunk)
     write_records_jsonl(records, records_path)
 
-    conversation_path = output_directory / "customer_support_transcripts.jsonl"
-    conversations = generate_support_conversations(chunks, target_count=conversation_records)
-    write_conversations_jsonl(conversations, conversation_path)
-
     tool_path = output_directory / "tool_calling_openai.jsonl"
     write_tool_call_jsonl(generate_tool_call_records(tool_records), tool_path)
+
+    conversations = generate_support_conversations(
+        chunks, count=support_conversations, seed=support_seed
+    )
+    support_paths = write_support_datasets(conversations, output_directory)
 
     embedding_directory = output_directory / "embedding_triplets"
     triplets = build_embedding_triplets(chunks)
     training_path, validation_path = split_and_write_triplets(triplets, embedding_directory)
     return {
         "grounded_records": records_path,
-        "customer_support_transcripts": conversation_path,
+        "support_conversations": support_paths["conversations"],
+        "support_openai_sft": support_paths["openai_sft"],
         "tool_calling": tool_path,
         "embedding_training": training_path,
         "embedding_validation": validation_path,
     }
+
+
+def evaluate_support_dataset(
+    conversations_jsonl: Path,
+    curated_jsonl: Path,
+    report_path: Path,
+    *,
+    thresholds: SupportEvaluationThresholds | None = None,
+) -> SupportEvaluationReport:
+    conversations = read_support_conversations_jsonl(conversations_jsonl)
+    chunks = read_chunks_jsonl(curated_jsonl)
+    report = evaluate_support_conversations(
+        conversations, chunks, thresholds or SupportEvaluationThresholds()
+    )
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    return report
 
 
 def evaluate_dataset(
@@ -163,33 +183,6 @@ def read_records_jsonl(path: Path) -> list[SyntheticRecord]:
             except ValueError as exc:
                 raise ValueError(f"Invalid synthetic record at {path}:{line_number}: {exc}") from exc
     return records
-
-
-def generate_conversation_dataset(
-    curated_jsonl: Path,
-    output_jsonl: Path,
-    *,
-    target_count: int = 1200,
-) -> Path:
-    chunks = read_chunks_jsonl(curated_jsonl)
-    conversations = generate_support_conversations(chunks, target_count=target_count)
-    write_conversations_jsonl(conversations, output_jsonl)
-    return output_jsonl
-
-
-def evaluate_conversation_dataset(
-    conversations_jsonl: Path,
-    curated_jsonl: Path,
-    report_path: Path,
-    *,
-    thresholds: ConversationEvaluationThresholds | None = None,
-) -> ConversationEvaluationReport:
-    conversations = read_conversations_jsonl(conversations_jsonl)
-    chunks = read_chunks_jsonl(curated_jsonl)
-    report = evaluate_conversations(conversations, chunks, thresholds)
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
-    return report
 
 
 def _load_receipts(path: Path) -> list[DownloadReceipt]:

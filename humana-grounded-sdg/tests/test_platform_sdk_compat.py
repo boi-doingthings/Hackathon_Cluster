@@ -10,7 +10,11 @@ from humana_sdg.nemo_platform_jobs import (
     PlatformConnection,
     run_data_designer_tool_calling,
 )
-from humana_sdg.safe_synth import SafeSynthSettings, run_safe_synthesis
+from humana_sdg.safe_synth import (
+    SafeSynthSettings,
+    build_safe_synth_score_payload,
+    run_safe_synthesis,
+)
 
 
 def test_safe_synthesizer_builder_matches_public_platform_extra() -> None:
@@ -174,3 +178,46 @@ def test_safe_synthesizer_adapter_writes_all_artifacts(
     assert result.synthetic_csv.exists()
     assert result.evaluation_report.exists()
     assert result.summary_json.exists()
+
+
+
+def test_safe_synth_score_payload_labels_official_raw_sqs_and_dps() -> None:
+    summary = SimpleNamespace(
+        synthetic_data_quality_score=8.75,
+        data_privacy_score=9.4,
+        num_valid_records=1200,
+        num_prompts=1200,
+        model_dump=lambda mode="json": {
+            "synthetic_data_quality_score": 8.75,
+            "data_privacy_score": 9.4,
+            "num_valid_records": 1200,
+            "num_prompts": 1200,
+            "text_semantic_similarity_score": 8.9,
+        },
+    )
+
+    payload = build_safe_synth_score_payload(summary, require_scores=True)
+
+    assert payload["sqs"] == 8.75
+    assert payload["dps"] == 9.4
+    assert payload["score_source"] == "nemo-safe-synthesizer"
+    assert payload["sqs_scale"] == "0-10"
+    assert payload["raw_summary"]["text_semantic_similarity_score"] == 8.9
+    assert payload["official_scores_available"] is True
+
+
+def test_safe_synth_score_payload_fails_closed_when_required_scores_are_missing() -> None:
+    summary = SimpleNamespace(
+        synthetic_data_quality_score=None,
+        data_privacy_score=None,
+        num_valid_records=1200,
+        num_prompts=1200,
+    )
+
+    with pytest.raises(RuntimeError, match="did not return required SQS/DPS"):
+        build_safe_synth_score_payload(summary, require_scores=True)
+
+    payload = build_safe_synth_score_payload(summary, require_scores=False)
+    assert payload["official_scores_available"] is False
+    assert payload["sqs"] is None
+    assert payload["dps"] is None
