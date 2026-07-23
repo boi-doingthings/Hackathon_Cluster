@@ -61,7 +61,7 @@ def main() -> int:
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=dtype,
+        dtype=dtype,
         device_map="auto" if torch.cuda.is_available() else None,
         trust_remote_code=True,
     )
@@ -90,6 +90,14 @@ def main() -> int:
         return {"text": text}
 
     ds = ds.map(to_text, remove_columns=[c for c in ds["train"].column_names if c != "text"])
+    max_train_samples = int(cfg.get("max_train_samples") or 0)
+    if max_train_samples > 0:
+        ds["train"] = ds["train"].select(range(min(max_train_samples, len(ds["train"]))))
+        print(f"[finetune] truncated train to {len(ds['train'])}")
+    max_val_samples = int(cfg.get("max_val_samples") or 0)
+    if max_val_samples > 0:
+        ds["validation"] = ds["validation"].select(range(min(max_val_samples, len(ds["validation"]))))
+        print(f"[finetune] truncated val to {len(ds['validation'])}")
 
     lora = LoraConfig(
         r=int(cfg.get("lora_r", 8)),
