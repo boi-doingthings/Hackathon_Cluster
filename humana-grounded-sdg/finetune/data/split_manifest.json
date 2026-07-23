@@ -1,0 +1,11 @@
+{
+  "created_at_utc": "2026-07-23T06:00:44.611521+00:00",
+  "source": "C:/Users/yashk/HumanaPublish/humana-grounded-sdg/results/humana-support-slm-1200/support_sft_openai.jsonl",
+  "source_sha256": "acda2ef6a357a75527eaf74aabc235317ffcd25a166b233908889c91586c9c56",
+  "total": 1200,
+  "train": 1140,
+  "val": 60,
+  "seed": 20260722,
+  "format": "openai_chat_messages",
+  "messages_per_row": 8
+}

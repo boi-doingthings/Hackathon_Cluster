@@ -1,0 +1,24 @@
+# H100/A100 full-ish LoRA config
+model_name_or_path: Qwen/Qwen2.5-0.5B-Instruct
+output_dir: outputs/gpu-qwen05b-lora
+train_file: data/support_sft_train.jsonl
+val_file: data/support_sft_val.jsonl
+max_seq_length: 2048
+num_train_epochs: 2
+max_steps: -1
+per_device_train_batch_size: 2
+per_device_eval_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-4
+warmup_ratio: 0.03
+logging_steps: 10
+eval_steps: 100
+save_steps: 200
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules: ["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"]
+bf16: true
+fp16: false
+seed: 20260722
+report_to: "none"

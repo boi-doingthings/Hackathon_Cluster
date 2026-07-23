@@ -1,0 +1,24 @@
+# CPU/GPU smoke config — tiny model, few steps
+model_name_or_path: HuggingFaceTB/SmolLM2-135M-Instruct
+output_dir: outputs/smoke-smollm135-lora
+train_file: data/support_sft_train.jsonl
+val_file: data/support_sft_val.jsonl
+max_seq_length: 1024
+num_train_epochs: 1
+max_steps: 20
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-4
+warmup_ratio: 0.03
+logging_steps: 1
+eval_steps: 10
+save_steps: 20
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_modules: ["q_proj","v_proj","k_proj","o_proj"]
+bf16: false
+fp16: false
+seed: 20260722
+report_to: "none"
