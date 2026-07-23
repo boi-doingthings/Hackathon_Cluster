@@ -1,0 +1,50 @@
+{
+  "train_runtime": 3041.9231,
+  "train_loss": 3.536410391330719,
+  "train_samples": 1140,
+  "val_samples": 60,
+  "model_name_or_path": "HuggingFaceTB/SmolLM2-135M-Instruct",
+  "output_dir": "C:\\Users\\yashk\\HumanaPublish\\humana-grounded-sdg\\finetune\\outputs\\smoke-smollm135-lora",
+  "cuda": false,
+  "max_steps": 20,
+  "config": {
+    "model_name_or_path": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "output_dir": "outputs/smoke-smollm135-lora",
+    "train_file": "data/support_sft_train.jsonl",
+    "val_file": "data/support_sft_val.jsonl",
+    "max_seq_length": 1024,
+    "num_train_epochs": 1,
+    "max_steps": 20,
+    "per_device_train_batch_size": 1,
+    "per_device_eval_batch_size": 1,
+    "gradient_accumulation_steps": 4,
+    "learning_rate": 0.0002,
+    "warmup_ratio": 0.03,
+    "logging_steps": 1,
+    "eval_steps": 10,
+    "save_steps": 20,
+    "lora_r": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "lora_target_modules": [
+      "q_proj",
+      "v_proj",
+      "k_proj",
+      "o_proj"
+    ],
+    "bf16": false,
+    "fp16": false,
+    "seed": 20260722,
+    "report_to": "none"
+  },
+  "eval": {
+    "eval_loss": 3.4626662731170654,
+    "eval_runtime": 115.8128,
+    "eval_samples_per_second": 0.518,
+    "eval_steps_per_second": 0.518,
+    "eval_entropy": 3.100602054595947,
+    "eval_num_tokens": 33536.0,
+    "eval_mean_token_accuracy": 0.39156595716873804,
+    "epoch": 0.07017543859649122
+  }
+}
